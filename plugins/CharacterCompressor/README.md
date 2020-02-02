@@ -1,0 +1,2 @@
+# Uprising
+Transition designer plugin

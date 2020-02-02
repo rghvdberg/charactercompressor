@@ -1,0 +1,56 @@
+#!/usr/bin/make -f
+# Makefile for DISTRHO Plugins #
+# ---------------------------- #
+# Created by falkTX
+#
+
+# --------------------------------------------------------------
+# Project name, used for binaries
+
+NAME = charactercompressor
+
+# --------------------------------------------------------------
+# Files to build
+
+FILES_DSP = CharacterCompressorPlugin.cpp\
+			dsp/CharacterCompressor.cpp
+
+FILES_UI  = CharacterCompressorUI.cpp \
+			##Widgets/src/NanoMeter.cpp
+
+# --------------------------------------------------------------
+# Do some magic
+
+include ../../dpf/Makefile.plugins.mk
+
+# --------------------------------------------------------------
+# Extra Flags
+BASE_FLAGS += -I. -I./Widgets -I./dsp
+
+# --------------------------------------------------------------
+# Enable all possible plugin types
+
+ifeq ($(HAVE_JACK),true)
+TARGETS += jack
+endif
+
+ifeq ($(LINUX),true)
+ifeq ($(HAVE_DGL),true)
+ifeq ($(HAVE_LIBLO),true)
+# TARGETS += ladspa
+# TARGETS += dssi
+endif
+endif
+endif
+
+ifeq ($(HAVE_DGL),true)
+TARGETS += lv2_sep
+else
+TARGETS += lv2_dsp
+endif
+
+TARGETS += vst
+
+all: $(TARGETS)
+
+# --------------------------------------------------------------
