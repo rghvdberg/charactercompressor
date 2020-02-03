@@ -23,9 +23,12 @@
 START_NAMESPACE_DISTRHO
 
 
-NanoMeter::NanoMeter(Window &parent) noexcept : NanoWidget(parent) 
+NanoMeter::NanoMeter(Widget* parent)
+    : NanoWidget(parent),
+      fValue(0.0f),
+      fMin(0.0f),
+      fMax(1.0f)
 {
-    
 }
 
 void NanoMeter::onNanoDisplay()

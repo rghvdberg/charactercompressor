@@ -23,17 +23,15 @@
 START_NAMESPACE_DISTRHO
 
 
-NanoKnob::NanoKnob(Window &parent) noexcept
- : NanoWidget(parent),
- mouseDown(false)
-
+NanoKnob::NanoKnob(Widget* parent, Callback* cb)
+    : NanoWidget(parent),
+      fValue(0.0f),
+      fMin(0.0f),
+      fMax(1.0f),
+      fRadius(1.0f),
+      fCallback(cb),
+      mouseDown(false)
 {
-    printf ("knob constructed , mousedown = %i\n", mouseDown);
-   
-}
-
-void NanoKnob::setCallback( Callback* callback) noexcept {
-    fCallback = callback;
 }
 
 void NanoKnob::onNanoDisplay()
@@ -86,32 +84,31 @@ void NanoKnob::setRadius(float radius)
     fRadius = radius;
 }
 
-float NanoKnob::getValue(){
+float NanoKnob::getValue() const
+{
     return fValue;
 }
 
-bool NanoKnob::onMouse(const MouseEvent &ev){
-    if(ev.press & contains(ev.pos))
+bool NanoKnob::onMouse(const MouseEvent &ev)
+{
+    if (ev.press & contains(ev.pos))
     {
         mouseDown = true;
         mousePoint = ev.pos;
         printf("mouseDown %i\n",mouseDown);
-     return mouseDown;
-
+        return true;
     }
-    if (!ev.press)
+    else if (mouseDown)
     {
 
         mouseDown = false;
-        return mouseDown;
+        return true;
     }
     return false;
-        
 }
 
 bool NanoKnob::onMotion(const MotionEvent &ev)
 {
-   
     if (mouseDown)
     {
        printf("onMotion::mouseDown %i\n",mouseDown);
@@ -120,8 +117,10 @@ bool NanoKnob::onMotion(const MotionEvent &ev)
        mousePoint.setY(ev.pos.getY());
        setValue(fValue + difference);
        fCallback->nanoKnobValueChanged(this, fValue);
+       return true;
     }
-    
+
+    return false;
 }
 
 

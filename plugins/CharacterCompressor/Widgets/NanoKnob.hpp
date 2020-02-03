@@ -34,10 +34,9 @@ public:
         virtual ~Callback() {}
         virtual void nanoKnobValueChanged ( NanoKnob * knob, float value) =0;
     };
-    void setCallback ( Callback* callback) noexcept;
-    explicit NanoKnob(Window& parent) noexcept;
+    explicit NanoKnob(Widget* parent, Callback* cb);
 
-    float getValue();
+    float getValue() const;
     void setValue(float value);
     void setRange(float min, float max);
     void setRadius(float radius);
@@ -46,19 +45,16 @@ protected:
     bool onMouse( const MouseEvent & ev) override;
   //  bool onScroll(const ScrollEvent & ev) override;
     bool onMotion(const MotionEvent & ev) override;
-    
-
 
 private:
     float fValue;
     float fMin;
     float fMax;
     float fRadius;
-    Callback* fCallback;
-    bool mouseDown = false;
+    Callback* const fCallback;
+    bool mouseDown;
     Point<int> mousePoint;
 
-   
     DISTRHO_LEAK_DETECTOR(NanoKnob)
 };
 

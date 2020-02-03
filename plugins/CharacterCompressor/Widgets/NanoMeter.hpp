@@ -28,20 +28,18 @@ START_NAMESPACE_DISTRHO
 class NanoMeter : public NanoWidget
 {
 public:
-    explicit NanoMeter(Window& parent) noexcept;
+    explicit NanoMeter(Widget* parent);
     void setValue(float value);
     void setRange(float min, float max);
+
 protected:
     void onNanoDisplay() override;
-    
-
 
 private:
     float fValue;
     float fMin;
     float fMax;
 
-   
     DISTRHO_LEAK_DETECTOR(NanoMeter)
 };
 
