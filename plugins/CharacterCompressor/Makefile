@@ -16,7 +16,8 @@ FILES_DSP = CharacterCompressorPlugin.cpp\
 			dsp/CharacterCompressor.cpp
 
 FILES_UI  = CharacterCompressorUI.cpp \
-			##Widgets/src/NanoMeter.cpp
+			Widgets/src/NanoMeter.cpp \
+			Widgets/src/NanoKnob.cpp
 
 # --------------------------------------------------------------
 # Do some magic

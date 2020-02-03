@@ -67,5 +67,4 @@ enum Parameters // exposed to the host
 };
 
 
-
 #endif // DISTRHO_PLUGIN_INFO_H_INCLUDED

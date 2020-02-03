@@ -17,22 +17,35 @@
  * along with CharacterCompressor.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef NANO_METER_HPP_INCLUDED
-#define NANO_METER_HPP_INCLUDED
+#ifndef NANO_KNOB_HPP_INCLUDED
+#define NANO_KNOB_HPP_INCLUDED
 
 #include "Widget.hpp"
 #include "NanoVG.hpp"
 
 START_NAMESPACE_DISTRHO
 
-class NanoMeter : public NanoWidget
+class NanoKnob : public NanoWidget
 {
 public:
-    explicit NanoMeter(Window& parent) noexcept;
+    class Callback
+    {
+        public:
+        virtual ~Callback() {}
+        virtual void nanoKnobValueChanged ( NanoKnob * knob, float value) =0;
+    };
+    void setCallback ( Callback* callback) noexcept;
+    explicit NanoKnob(Window& parent) noexcept;
+
+    float getValue();
     void setValue(float value);
     void setRange(float min, float max);
+    void setRadius(float radius);
 protected:
     void onNanoDisplay() override;
+    bool onMouse( const MouseEvent & ev) override;
+  //  bool onScroll(const ScrollEvent & ev) override;
+    bool onMotion(const MotionEvent & ev) override;
     
 
 
@@ -40,9 +53,13 @@ private:
     float fValue;
     float fMin;
     float fMax;
+    float fRadius;
+    Callback* fCallback;
+    bool mouseDown = false;
+    Point<int> mousePoint;
 
    
-    DISTRHO_LEAK_DETECTOR(NanoMeter)
+    DISTRHO_LEAK_DETECTOR(NanoKnob)
 };
 
 END_NAMESPACE_DISTRHO

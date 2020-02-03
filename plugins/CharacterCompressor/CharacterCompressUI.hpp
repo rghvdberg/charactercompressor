@@ -16,13 +16,16 @@
 
 #include "DistrhoPluginInfo.h"
 #include "DistrhoUI.hpp"
-//#include "Widgets/NanoMeter.hpp"
+#include "CC_Parameters.hpp"
+#include "Widgets/NanoMeter.hpp"
+#include "Widgets/NanoKnob.hpp"
 
 START_NAMESPACE_DISTRHO
 
 // -----------------------------------------------------------------------------------------------------------
 
-class CharacterCompressorUI : public UI
+class CharacterCompressorUI : public UI,
+    public NanoKnob::Callback
 {
 
 public: 
@@ -31,8 +34,10 @@ public:
 protected:
     void parameterChanged(uint32_t index, float value) override;
     void onNanoDisplay() override;
+    void nanoKnobValueChanged( NanoKnob* nanoKnob, const float value) override;
 private:
-    //ScopedPointer<NanoMeter> fNanoMeter;
+    ScopedPointer<NanoMeter> fNanoMeter;
+    ScopedPointer<NanoKnob> fInGain,fThreshold,fRatio,fAttack,fRelease;
 
     // Parameters
 
