@@ -38,6 +38,7 @@ protected:
 private:
     ScopedPointer<NanoMeter> fNanoMeter;
     ScopedPointer<NanoKnob> fInGain,fThreshold,fRatio,fAttack,fRelease;
+    FontId fNanoFont;
 
     // Parameters
 

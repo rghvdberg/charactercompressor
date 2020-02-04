@@ -22,6 +22,7 @@
 
 #include "Widget.hpp"
 #include "NanoVG.hpp"
+#include <string>
 
 START_NAMESPACE_DISTRHO
 
@@ -40,6 +41,7 @@ public:
     void setValue(float value);
     void setRange(float min, float max);
     void setRadius(float radius);
+    void setLabel(std::string lable);
 protected:
     void onNanoDisplay() override;
     bool onMouse( const MouseEvent & ev) override;
@@ -51,9 +53,11 @@ private:
     float fMin;
     float fMax;
     float fRadius;
+    std::string Label;
     Callback* const fCallback;
     bool mouseDown;
     Point<int> mousePoint;
+    FontId fNanoFont;
 
     DISTRHO_LEAK_DETECTOR(NanoKnob)
 };

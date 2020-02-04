@@ -1,6 +1,6 @@
 #ifndef CC_PARAMETERS_H_INCLUDED
 #define CC_PARAMETERS_H_INCLUDED
-
+//TODO : make #defines out of this ?
 const char* portNames[] {
     "Input Gain",           "peak/RMS",         "RMS size",
     "Threshold",            "Ratio",            "Attack",
