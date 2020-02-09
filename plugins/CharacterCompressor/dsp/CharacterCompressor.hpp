@@ -42,13 +42,14 @@ public:
     enum { NumParameters = 23 };
 
     enum Parameter {
-        p_Input_Gain,
-        p_peak_RMS,
-        p_RMS_size,
         p_Threshold,
-        p_Ratio,
+        p_strength,
         p_Attack,
         p_Release,
+        p_Input_Gain,
+        p_peak_RMS,
+        p_detector_Ratio,
+        p_Release2,
         p_sidechain_hpf,
         p_power,
         p_Max_Gain_Reduction,
@@ -63,8 +64,7 @@ public:
         p_max_decay,
         p_decayMult,
         p_decayPower,
-        p_IM_size,
-        p_gainReduction,
+        P_gainReduction,
         
     };
 
@@ -88,19 +88,21 @@ public:
     void set_parameter(unsigned index, float value) noexcept;
 
     
-    float get_Input_Gain() const noexcept;
-    
-    float get_peak_RMS() const noexcept;
-    
-    float get_RMS_size() const noexcept;
-    
     float get_Threshold() const noexcept;
     
-    float get_Ratio() const noexcept;
+    float get_strength() const noexcept;
     
     float get_Attack() const noexcept;
     
     float get_Release() const noexcept;
+    
+    float get_Input_Gain() const noexcept;
+    
+    float get_peak_RMS() const noexcept;
+    
+    float get_detector_Ratio() const noexcept;
+    
+    float get_Release2() const noexcept;
     
     float get_sidechain_hpf() const noexcept;
     
@@ -130,24 +132,24 @@ public:
     
     float get_decayPower() const noexcept;
     
-    float get_IM_size() const noexcept;
+    float get_gainReduction() const noexcept;
     
-    float get_foo() const noexcept;
     
+    void set_Threshold(float value) noexcept;
+    
+    void set_strength(float value) noexcept;
+    
+    void set_Attack(float value) noexcept;
+    
+    void set_Release(float value) noexcept;
     
     void set_Input_Gain(float value) noexcept;
     
     void set_peak_RMS(float value) noexcept;
     
-    void set_RMS_size(float value) noexcept;
+    void set_detector_Ratio(float value) noexcept;
     
-    void set_Threshold(float value) noexcept;
-    
-    void set_Ratio(float value) noexcept;
-    
-    void set_Attack(float value) noexcept;
-    
-    void set_Release(float value) noexcept;
+    void set_Release2(float value) noexcept;
     
     void set_sidechain_hpf(float value) noexcept;
     
@@ -176,8 +178,6 @@ public:
     void set_decayMult(float value) noexcept;
     
     void set_decayPower(float value) noexcept;
-    
-    void set_IM_size(float value) noexcept;
     
 
 public:

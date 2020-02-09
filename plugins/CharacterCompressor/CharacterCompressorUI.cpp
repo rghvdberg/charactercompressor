@@ -15,116 +15,162 @@
  */
 
 #include "CharacterCompressUI.hpp"
+#include "dsp/CharacterCompressor.hpp"
+#include "Window.hpp"
 
 START_NAMESPACE_DISTRHO
 
 // -----------------------------------------------------------------------------------------------------------
 
 CharacterCompressorUI::CharacterCompressorUI()
-        : UI(500, 250)
-    {
-        loadSharedResources();
-        fNanoFont= findFont(NANOVG_DEJAVU_SANS_TTF);
-        const Size<uint> knobSize (80,100);
-        const float knobRadius = 35;
-        const int knob_x_spacing = 90;
-        const int knob_x = 40;
-        const int knob_y = 20;
-        
-        fNanoMeter = new NanoMeter(this);
-        fNanoMeter->setId(p_foo);
-        fNanoMeter->setAbsolutePos(10,10);
-        fNanoMeter->setSize(10,knobSize.getHeight());
-        fNanoMeter->setRange(minimumValues[p_foo],maximumValues[p_foo]);
-        fNanoMeter->setValue(defaultValues[p_foo]);
+    : UI(500, 250)
+{
+    Window &pw = getParentWindow();
+    pw.addIdleCallback(this);
 
-        fInGain = new NanoKnob(this, this);
-        fInGain->setId(p_Input_Gain);
-        fInGain->setAbsolutePos(knob_x,knob_y);
-        fInGain->setSize(knobSize);
-        fInGain->setRadius(knobRadius);
-        fInGain->setValue(defaultValues[p_Input_Gain]);
-        fInGain->setRange(minimumValues[p_Input_Gain],maximumValues[p_Input_Gain]);
-        fInGain->setLabel(portNames[p_Input_Gain]);
-        
-        fThreshold = new NanoKnob(this, this);
-        fThreshold->setId(p_Threshold);
-        fThreshold->setAbsolutePos( knob_x + knob_x_spacing * 1 ,knob_y);
-        fThreshold->setSize(knobSize);
-        fThreshold->setRadius(knobRadius);
-        fThreshold->setValue(defaultValues[p_Threshold]);
-        fThreshold->setRange(minimumValues[p_Threshold],maximumValues[p_Threshold]);
-        fThreshold->setLabel(portNames[p_Threshold]);
-        
-        fRatio = new NanoKnob(this, this);
-        fRatio->setId(p_Ratio);
-        fRatio->setAbsolutePos(knob_x + knob_x_spacing * 2, knob_y);
-        fRatio->setSize(knobSize);
-        fRatio->setRadius(knobRadius);
-        fRatio->setValue(defaultValues[p_Ratio]);
-        fRatio->setRange(minimumValues[p_Ratio],maximumValues[p_Ratio]);
-        fRatio->setLabel(portNames[p_Ratio]);
+    historyHead = 0;
+    loadSharedResources();
+    fNanoFont = findFont(NANOVG_DEJAVU_SANS_TTF);
+    const Size<uint> knobSize(80, 100);
+    const float knobRadius = 35;
+    const int knob_x_spacing = 90;
+    const int knob_x = 40;
+    const int knob_y = 20;
 
-        fAttack = new NanoKnob(this, this);
-        fAttack->setId(p_Attack);
-        fAttack->setAbsolutePos(knob_x + knob_x_spacing * 3, knob_y);
-        fAttack->setSize(knobSize);
-        fAttack->setRadius(knobRadius);
-        fAttack->setValue(defaultValues[p_Attack]);
-        fAttack->setRange(minimumValues[p_Attack],maximumValues[p_Attack]);
-        fAttack->setLabel(portNames[p_Attack]);
+    fNanoMeter = new NanoMeter(this);
+    fNanoMeter->setId(p_gainReduction);
+    fNanoMeter->setAbsolutePos(10, 10);
+    fNanoMeter->setSize(10, knobSize.getHeight());
+    fNanoMeter->setRange(paramRange[p_gainReduction].min, paramRange[p_gainReduction].max);
+    fNanoMeter->setValue(paramRange[p_gainReduction].def);
 
-        fRelease = new NanoKnob(this, this);
-        fRelease->setId(p_Release);
-        fRelease->setAbsolutePos(knob_x + knob_x_spacing * 4, knob_y);
-        fRelease->setSize(knobSize);
-        fRelease->setRadius(knobRadius);
-        fRelease->setValue(defaultValues[p_Release]);
-        fRelease->setRange(minimumValues[p_Release],maximumValues[p_Release]);
-        fRelease->setLabel(portNames[p_Release]);
-        
+    fInGain = new NanoKnob(this, this);
+    fInGain->setId(p_Input_Gain);
+    fInGain->setAbsolutePos(knob_x, knob_y);
+    fInGain->setSize(knobSize);
+    fInGain->setRadius(knobRadius);
+    fInGain->setValue(paramRange[p_Input_Gain].def);
+    fInGain->setRange(paramRange[p_Input_Gain].min, paramRange[p_Input_Gain].max);
+    fInGain->setLabel(paramNames[p_Input_Gain]);
 
-    } 
+    fThreshold = new NanoKnob(this, this);
+    fThreshold->setId(p_Threshold);
+    fThreshold->setAbsolutePos(knob_x + knob_x_spacing * 1, knob_y);
+    fThreshold->setSize(knobSize);
+    fThreshold->setRadius(knobRadius);
+    fThreshold->setValue(paramRange[p_Threshold].def);
+    fThreshold->setRange(paramRange[p_Threshold].min, paramRange[p_Threshold].max);
+    fThreshold->setLabel(paramNames[p_Threshold]);
 
+    fAttack = new NanoKnob(this, this);
+    fAttack->setId(p_Attack);
+    fAttack->setAbsolutePos(knob_x + knob_x_spacing * 3, knob_y);
+    fAttack->setSize(knobSize);
+    fAttack->setRadius(knobRadius);
+    fAttack->setValue(paramRange[p_Attack].def);
+    fAttack->setRange(paramRange[p_Attack].min, paramRange[p_Attack].max);
+    fAttack->setLabel(paramNames[p_Attack]);
+
+    fRelease = new NanoKnob(this, this);
+    fRelease->setId(p_Release);
+    fRelease->setAbsolutePos(knob_x + knob_x_spacing * 4, knob_y);
+    fRelease->setSize(knobSize);
+    fRelease->setRadius(knobRadius);
+    fRelease->setValue(paramRange[p_Release].def);
+    fRelease->setRange(paramRange[p_Release].min, paramRange[p_Release].max);
+    fRelease->setLabel(paramNames[p_Release]);
+}
 
 void CharacterCompressorUI::parameterChanged(uint32_t index, float value)
+{
+    switch (index)
     {
-        switch (index)
-        {
-        case p_foo:
-            fNanoMeter->setValue(value);
-            break;
-        case p_Input_Gain:
-            fInGain->setValue(value);
-            break;
-      /*   case p_Threshold:
-            fThreshold->setValue(value);
-            break; */
-        default:
-            break;
-        }
+    case p_gainReduction:
+        fNanoMeter->setValue(value);
+        break;
+    case p_Input_Gain:
+        fInGain->setValue(value);
+        break;
+    case p_output:
+    {
+        printf("output level %f\n",value);
+        if (value > 0)
+            fdBOutput = 20 * log10(value);
+        else
+            fdBOutput = -60;
+    
+        fOutputLevel = value;
 
-     
+        break;
     }
+    case p_input:
+    {
+        if (value > 0)
+            fdBInput = 20 * log10(value);
+        else
+            fdBInput = -60;
+        break;
+    }
+    default:
+        break;
+    }
+}
 
-void CharacterCompressorUI::onNanoDisplay(){
-    beginPath();
+void CharacterCompressorUI::onNanoDisplay()
+{
     auto w = getWidth();
     auto h = getHeight();
-    fillColor( 32,32,32);
-    rect(0,0,w,h);
+    beginPath();
+    fillColor(32, 32, 32);
+    rect(0, 0, w, h);
     fill();
     closePath();
-    }
+    char buffer[32];
+    beginPath();
+    sprintf(buffer, "%.1f", fdBInput);
+    fontSize(16);
+    textAlign(ALIGN_MIDDLE | ALIGN_TOP);
+    fontFaceId(fNanoFont);
+    fillColor(255, 255, 255, 255);
+    text(50, 150, buffer, NULL);
+    closePath();
+    // line input
+    beginPath();
+    strokeWidth(1.0f);
+    strokeColor(255, 0, 0);
+    moveTo(0, h - 60 - fInVolumeHistory[0]);
+    for (int i = 1; i < 500; i++)
+        lineTo(i, h - 60 - fInVolumeHistory[i]);
+    stroke();
+    closePath();
+    // line output
+    beginPath();
+    strokeWidth(1.0f);
+    strokeColor(0, 255, 0);
+    moveTo(0, h - 60 - fOutVolumeHistory[0]);
+    for (int i = 1; i < 500; i++)
+        lineTo(i, h - 60 - fOutVolumeHistory[i]);
+    stroke();
+    closePath();
+}
 
-void CharacterCompressorUI::nanoKnobValueChanged(NanoKnob * knob, const float value)
+void CharacterCompressorUI::idleCallback()
+{
+    fInVolumeHistory[historyHead] = fdBInput;
+    fOutVolumeHistory[historyHead] = fdBOutput;
+    historyHead++;
+    historyHead %= 500;
+    repaint();
+}
+
+void CharacterCompressorUI::nanoKnobValueChanged(NanoKnob *knob, const float value)
 
 {
     int KnobId = knob->getId();
-    setParameterValue( KnobId, value);
+    setParameterValue(KnobId, value);
 }
 
-UI* createUI()
+UI *createUI()
 {
     return new CharacterCompressorUI();
 }

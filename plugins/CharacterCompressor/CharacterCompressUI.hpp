@@ -25,9 +25,9 @@ START_NAMESPACE_DISTRHO
 // -----------------------------------------------------------------------------------------------------------
 
 class CharacterCompressorUI : public UI,
-    public NanoKnob::Callback
+    public NanoKnob::Callback,
+    public IdleCallback
 {
-
 public: 
     CharacterCompressorUI();
 
@@ -35,10 +35,16 @@ protected:
     void parameterChanged(uint32_t index, float value) override;
     void onNanoDisplay() override;
     void nanoKnobValueChanged( NanoKnob* nanoKnob, const float value) override;
+    void idleCallback() override;
 private:
+    
     ScopedPointer<NanoMeter> fNanoMeter;
     ScopedPointer<NanoKnob> fInGain,fThreshold,fRatio,fAttack,fRelease;
     FontId fNanoFont;
+    float fInputLevel, fOutputLevel, fdBInput, fdBOutput;
+    float fInVolumeHistory[500];
+    float fOutVolumeHistory[500];
+    int historyHead;
 
     // Parameters
 

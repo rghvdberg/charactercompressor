@@ -17,35 +17,35 @@
  * along with Uprising.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef DISTRHO_PLUGIN_INFO_H_INCLUDED
 #define DISTRHO_PLUGIN_INFO_H_INCLUDED
 
 #define DISTRHO_PLUGIN_BRAND "Clearly Broken Software"
-#define DISTRHO_PLUGIN_NAME  "Character Compressor"
-#define DISTRHO_PLUGIN_URI   "https://github.com/rghvdberg/CharacterCompressor"
+#define DISTRHO_PLUGIN_NAME "Character Compressor"
+#define DISTRHO_PLUGIN_URI "https://github.com/rghvdberg/CharacterCompressor"
 
 #define DISTRHO_PLUGIN_IS_SYNTH 0
-#define DISTRHO_PLUGIN_HAS_UI       1
-#define DISTRHO_PLUGIN_IS_RT_SAFE   1
+#define DISTRHO_PLUGIN_HAS_UI 1
+#define DISTRHO_PLUGIN_IS_RT_SAFE 1
 #define DISTRHO_PLUGIN_NUM_INPUTS 2
-#define DISTRHO_PLUGIN_NUM_OUTPUTS  2
-#define DISTRHO_PLUGIN_WANT_STATE   0
+#define DISTRHO_PLUGIN_NUM_OUTPUTS 2
+#define DISTRHO_PLUGIN_WANT_STATE 0
 #define DISTRHO_PLUGIN_WANT_FULL_STATE 0
 #define DISTRHO_UI_USE_NANOVG 1
-#define DISTRHO_PLUGIN_WANT_DIRECT_ACCESS   0
+#define DISTRHO_PLUGIN_WANT_DIRECT_ACCESS 0
 
 #define DISTRHO_PLUGIN_LV2_CATEGORY "lv2:CompressorPlugin"
 
 enum Parameters // exposed to the host
 {
-    p_Input_Gain,
-    p_peak_RMS,
-    p_RMS_size,
     p_Threshold,
-    p_Ratio,
+    p_strength,
     p_Attack,
     p_Release,
+    p_Input_Gain,
+    p_peak_RMS,
+    p_detector_Ratio,
+    p_Release2,
     p_sidechain_hpf,
     p_power,
     p_Max_Gain_Reduction,
@@ -60,11 +60,11 @@ enum Parameters // exposed to the host
     p_max_decay,
     p_decayMult,
     p_decayPower,
-    p_IM_size,
-    p_foo, // output
+    p_gainReduction,
+    p_input,
+    p_output,
     parameterCount
-   
-};
 
+};
 
 #endif // DISTRHO_PLUGIN_INFO_H_INCLUDED
