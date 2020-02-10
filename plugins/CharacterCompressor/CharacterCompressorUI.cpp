@@ -87,18 +87,18 @@ void CharacterCompressorUI::parameterChanged(uint32_t index, float value)
     {
     case p_gainReduction:
         fNanoMeter->setValue(value);
+        fdBGainReduction = value;
         break;
     case p_Input_Gain:
         fInGain->setValue(value);
         break;
     case p_output:
     {
-        printf("output level %f\n",value);
         if (value > 0)
             fdBOutput = 20 * log10(value);
         else
             fdBOutput = -60;
-    
+
         fOutputLevel = value;
 
         break;
@@ -138,26 +138,48 @@ void CharacterCompressorUI::onNanoDisplay()
     beginPath();
     strokeWidth(1.0f);
     strokeColor(255, 0, 0);
-    moveTo(0, h - 60 - fInVolumeHistory[0]);
-    for (int i = 1; i < 500; i++)
-        lineTo(i, h - 60 - fInVolumeHistory[i]);
+    moveTo(0, h - 60 - fInVolumeHistory[historyHead]);
+    for (int i = 1, j; i < 500; i++)
+    {
+        j = (i + historyHead) % 500;
+        lineTo(i, h - 60 - fInVolumeHistory[j]);
+    }
     stroke();
     closePath();
     // line output
     beginPath();
     strokeWidth(1.0f);
     strokeColor(0, 255, 0);
-    moveTo(0, h - 60 - fOutVolumeHistory[0]);
-    for (int i = 1; i < 500; i++)
-        lineTo(i, h - 60 - fOutVolumeHistory[i]);
+    moveTo(0, h - 60 - fOutVolumeHistory[historyHead]);
+    for (int i = 1, j; i < 500; i++)
+    {
+        j = (i + historyHead) % 500;
+        lineTo(i, h - 60 - fOutVolumeHistory[j]);
+    }
     stroke();
     closePath();
+
+    // line gain reduction
+    beginPath();
+    strokeWidth(1.0f);
+    strokeColor(0, 255, 255);
+    moveTo(0, h - 60 - fGainReductionHistory[historyHead]);
+    for (int i = 1, j; i < 500; i++)
+    {
+        j = (i + historyHead) % 500;
+        lineTo(i, h - 60 - fGainReductionHistory[j]);
+    }
+    stroke();
+    closePath();
+
+
 }
 
 void CharacterCompressorUI::idleCallback()
 {
     fInVolumeHistory[historyHead] = fdBInput;
     fOutVolumeHistory[historyHead] = fdBOutput;
+    fGainReductionHistory[historyHead] = fdBGainReduction;
     historyHead++;
     historyHead %= 500;
     repaint();

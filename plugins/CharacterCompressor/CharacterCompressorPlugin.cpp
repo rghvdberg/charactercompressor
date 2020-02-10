@@ -92,6 +92,18 @@ protected:
             parameter.hints = kParameterIsOutput;
             break;
         }
+        case p_gainReduction:
+        {
+            parameter.hints = kParameterIsOutput;
+            parameter.ranges.min = ccDSP.parameter_range(index)->min;
+            parameter.ranges.max = ccDSP.parameter_range(index)->max;
+            parameter.ranges.def = ccDSP.parameter_range(index)->init;
+            parameter.name = ccDSP.parameter_label(index);
+            parameter.symbol = ccDSP.parameter_symbol(index);
+            parameter.unit = ccDSP.parameter_unit(index);
+            break;
+        }
+
         default:
             parameter.hints = kParameterIsAutomable;
             parameter.ranges.min = ccDSP.parameter_range(index)->min;
@@ -128,14 +140,14 @@ protected:
     void run(const float **inputs, float **outputs, uint32_t frames) override
     {
         ccDSP.process(inputs[0], inputs[1], outputs[0], outputs[1], frames);
-        
+
         float tmp;
-        float tmpLeft  = 0.0f;
+        float tmpLeft = 0.0f;
         float tmpRight = 0.0f;
 
         // inputs;
 
-        for (uint32_t i=0; i<frames; ++i)
+        for (uint32_t i = 0; i < frames; ++i)
         {
             // left
             tmp = std::abs(inputs[0][i]);
@@ -151,12 +163,12 @@ protected:
             tmpLeft = 1.0f;
         if (tmpRight > 1.0f)
             tmpRight = 1.0f;
-        fInput = (tmpLeft + tmpRight) /2;
+        fInput = (tmpLeft + tmpRight) / 2;
 
         // outputs;
         tmpLeft = 0.0f;
         tmpRight = 0.0f;
-             for (uint32_t i=0; i<frames; ++i)
+        for (uint32_t i = 0; i < frames; ++i)
         {
             // left
             tmp = std::abs(outputs[0][i]);
@@ -172,8 +184,8 @@ protected:
             tmpLeft = 1.0f;
         if (tmpRight > 1.0f)
             tmpRight = 1.0f;
-        fOutput = (tmpLeft + tmpRight) /2;
-     }
+        fOutput = (tmpLeft + tmpRight) / 2;
+    }
 
 private:
     CharacterCompressor ccDSP;

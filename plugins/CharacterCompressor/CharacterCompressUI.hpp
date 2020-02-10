@@ -41,9 +41,10 @@ private:
     ScopedPointer<NanoMeter> fNanoMeter;
     ScopedPointer<NanoKnob> fInGain,fThreshold,fRatio,fAttack,fRelease;
     FontId fNanoFont;
-    float fInputLevel, fOutputLevel, fdBInput, fdBOutput;
+    float fInputLevel, fOutputLevel, fdBInput, fdBOutput, fdBGainReduction;
     float fInVolumeHistory[500];
     float fOutVolumeHistory[500];
+    float fGainReductionHistory[500];
     int historyHead;
 
     // Parameters
