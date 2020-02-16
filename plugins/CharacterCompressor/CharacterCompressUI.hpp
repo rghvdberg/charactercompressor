@@ -19,6 +19,9 @@
 #include "CC_Parameters.hpp"
 #include "Widgets/NanoMeter.hpp"
 #include "Widgets/NanoKnob.hpp"
+#include "Widgets/NanoHistogram.hpp"
+#include "Resources/Colors.hpp"
+#include <chrono>
 
 START_NAMESPACE_DISTRHO
 
@@ -40,12 +43,11 @@ private:
     
     ScopedPointer<NanoMeter> fNanoMeter;
     ScopedPointer<NanoKnob> fInGain,fThreshold,fRatio,fAttack,fRelease;
+    ScopedPointer<NanoHistogram> fHistogram;
     FontId fNanoFont;
     float fInputLevel, fOutputLevel, fdBInput, fdBOutput, fdBGainReduction;
-    float fInVolumeHistory[500];
-    float fOutVolumeHistory[500];
-    float fGainReductionHistory[500];
-    int historyHead;
+//    void printFPS();
+//    std::chrono::high_resolution_clock::time_point oldTime,newTime;
 
     // Parameters
 

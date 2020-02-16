@@ -22,8 +22,7 @@
 
 START_NAMESPACE_DISTRHO
 
-
-NanoKnob::NanoKnob(Widget* parent, Callback* cb)
+NanoKnob::NanoKnob(Widget *parent, Callback *cb)
     : NanoWidget(parent),
       fValue(0.0f),
       fMin(0.0f),
@@ -38,75 +37,91 @@ NanoKnob::NanoKnob(Widget* parent, Callback* cb)
 
 void NanoKnob::onNanoDisplay()
 {
-float normValue = (fValue-fMin) / (fMax - fMin);
+    float normValue = (fValue - fMin) / (fMax - fMin);
 
-auto w = getWidth();
-auto h = getHeight();
-// Knob
-beginPath();
-fillColor(64,64,64,255);
-circle(w/2,fRadius,fRadius);
-fill();
-closePath();
+    auto w = getWidth();
+    auto h = getHeight();
+    auto margin = 1.0f;
+    const float percentFilled = (fValue - fMin) / (fMax - fMin);
 
-//Indicator line
-beginPath();
-save();
-translate(w/2, fRadius);
-rotate((2.0f + ((normValue - 0.5f) * 1.5f)) * M_PI);
-fillColor(200,200,200,255);
-const float indicatorWidht = 3.0f;
-const float x = w/2 - indicatorWidht /2;
-const float y = 0; // h/2 - fRadius;
-rect( x -w/2 , y -fRadius , indicatorWidht,fRadius/4);
-fill();
-restore();
-closePath();
+    // Knob
+    beginPath();
+    fillColor(64, 64, 64, 255);
+    circle(w / 2, fRadius + margin, fRadius);
+    //fillColor(Secondary2Shade2);
+    fill();
+    closePath();
+    // arc
+    beginPath();
+    strokeWidth(margin * 2);
+    strokeColor(cRange);
+    arc(w / 2, fRadius + margin, fRadius - margin, 0.75f * M_PI, 0.25f * M_PI, NanoVG::Winding::CW);
+    stroke();
+    closePath();
 
-//Label
-beginPath();
-fontFaceId(fNanoFont);
-fontSize(14);
-Rectangle<float> bounds;
-textBounds(0,0,Label.c_str(),NULL,bounds);
-float tw = bounds.getWidth();
-float th = bounds.getHeight();
-float tx = w/2.0f - tw/2.0f;
-float ty = h - th;
+    beginPath();
+    strokeColor(cValue);
+    arc(w / 2, fRadius + margin, fRadius - margin, 0.75f * M_PI, (0.75f + 1.5f * percentFilled) * M_PI, NanoVG::Winding::CW);
+    stroke();
+    closePath();
 
-fillColor(255,255,255,255);
-text( tx, ty, Label.c_str(), NULL);
-closePath();
+    //Indicator line
+    beginPath();
+    save();
+    translate(w / 2, fRadius + margin);
+    rotate((2.0f + ((normValue - 0.5f) * 1.5f)) * M_PI);
+    fillColor(cValue);
+    const float indicatorWidht = 3.0f;
+    const float x = w / 2 - indicatorWidht / 2;
+    const float y = 0; // h/2 - fRadius;
+    rect(x - w / 2, y - fRadius + margin, indicatorWidht, fRadius / 4);
+    fill();
+    restore();
+    closePath();
 
-// Value
-// draw value bg
-beginPath();
-fillColor(50,50,50,255);
-const float bgWidth = fRadius + fRadius/4;
-const float bgHeight = 18;
-rect(w/2 - bgWidth/2, fRadius - bgHeight/2, bgWidth, bgHeight);
-fill();
-closePath();
-// text
-beginPath();
-char buffer[32]; 
-sprintf(buffer,"%.1f",getValue());
-fontSize(12);
-textAlign(ALIGN_MIDDLE|ALIGN_TOP);
-textBounds(0,0,buffer,NULL,bounds);
-fontFaceId(fNanoFont);
-fillColor(255,255,255,255);
-tx = w/2 - bounds.getWidth()/2;
-ty = fRadius - bounds.getHeight()/2; 
-text( tx, ty, buffer, NULL);
-closePath();
+    //Label
+    beginPath();
+    fontFaceId(fNanoFont);
+    fontSize(14);
+    Rectangle<float> bounds;
+    textBounds(0, 0, Label.c_str(), NULL, bounds);
+    float tw = bounds.getWidth();
+    float th = bounds.getHeight();
+    float tx = w / 2.0f - tw / 2.0f;
+    float ty = h - th;
 
+    fillColor(255, 255, 255, 255);
+    text(tx, ty, Label.c_str(), NULL);
+    closePath();
+
+    // Value
+    // draw value bg
+    beginPath();
+    fillColor(50, 50, 50, 255);
+    const float bgWidth = fRadius + fRadius / 4;
+    const float bgHeight = 18;
+    rect(w / 2 - bgWidth / 2, fRadius - bgHeight / 2, bgWidth, bgHeight);
+    fill();
+    closePath();
+    // text
+    beginPath();
+    char buffer[32];
+    sprintf(buffer, "%.1f", getValue());
+    fontSize(12);
+    textAlign(ALIGN_MIDDLE | ALIGN_TOP);
+    textBounds(0, 0, buffer, NULL, bounds);
+    fontFaceId(fNanoFont);
+    fillColor(255, 255, 255, 255);
+    tx = w / 2 - bounds.getWidth() / 2;
+    ty = fRadius - bounds.getHeight() / 2;
+    text(tx, ty, buffer, NULL);
+    closePath();
 }
 
 void NanoKnob::setValue(float value)
 {
     fValue = value;
-    if(fValue > fMax)
+    if (fValue > fMax)
         fValue = fMax;
     if (fValue < fMin)
         fValue = fMin;
@@ -123,10 +138,16 @@ void NanoKnob::setRadius(float radius)
     fRadius = radius;
 }
 
-void NanoKnob::setLabel(std::string label){
+void NanoKnob::setLabel(std::string label)
+{
     Label = label;
 }
 
+void NanoKnob::setColors(Color value, Color range)
+{
+    cValue = value;
+    cRange = range;
+}
 float NanoKnob::getValue() const
 {
     return fValue;
@@ -153,17 +174,25 @@ bool NanoKnob::onMotion(const MotionEvent &ev)
 {
     if (mouseDown)
     {
-       const float resistance = 100.0f;
-       const float difference = (mousePoint.getY() - ev.pos.getY()) / resistance * (fMax - fMin);
-       mousePoint.setY(ev.pos.getY());
-       setValue(fValue + difference);
-       fCallback->nanoKnobValueChanged(this, fValue);
-       return true;
+        const float resistance = 100.0f;
+        const float difference = (mousePoint.getY() - ev.pos.getY()) / resistance * (fMax - fMin);
+        mousePoint.setY(ev.pos.getY());
+        setValue(fValue + difference);
+        fCallback->nanoKnobValueChanged(this, fValue);
+        return true;
     }
 
     return false;
 }
 
+bool NanoKnob::onScroll(const ScrollEvent &ev)
+{
+    if (!contains(ev.pos))
+        return false;
+    float delta = ev.delta.getY() * (fMax - fMin) / 50;
+    setValue(fValue + delta);
+    fCallback->nanoKnobValueChanged(this, fValue);
+    return true;
+}
 
 END_NAMESPACE_DISTRHO
-

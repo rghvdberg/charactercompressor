@@ -17,52 +17,35 @@
  * along with CharacterCompressor.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef NANO_KNOB_HPP_INCLUDED
-#define NANO_KNOB_HPP_INCLUDED
+#ifndef NANO_HISTOGRAM_HPP_INCLUDED
+#define NANO_HISTOGRAM_HPP_INCLUDED
 
 #include "Widget.hpp"
 #include "NanoVG.hpp"
-#include <string>
+#include "../Resources/Colors.hpp"
 
 START_NAMESPACE_DISTRHO
 
-class NanoKnob : public NanoWidget
+class NanoHistogram : public NanoWidget
 {
 public:
-    class Callback
-    {
-    public:
-        virtual ~Callback() {}
-        virtual void nanoKnobValueChanged(NanoKnob *knob, float value) = 0;
-    };
-    explicit NanoKnob(Widget *parent, Callback *cb);
-
-    float getValue() const;
-    void setValue(float value);
-    void setRange(float min, float max);
-    void setRadius(float radius);
-    void setLabel(std::string lable);
-    void setColors(Color value, Color range);
-
+    explicit NanoHistogram(NanoWidget * parent);
+    void setValues(float input, float output, float gain_reduction);
+    void setHistoryLength( int history);
+ 
 protected:
     void onNanoDisplay() override;
-    bool onMouse(const MouseEvent &ev) override;
-    bool onScroll(const ScrollEvent &ev) override;
-    bool onMotion(const MotionEvent &ev) override;
 
 private:
-    float fValue;
-    float fMin;
-    float fMax;
-    float fRadius;
-    std::string Label;
-    Callback *const fCallback;
-    bool mouseDown;
-    Point<int> mousePoint;
-    FontId fNanoFont;
-    Color cValue, cRange;
-
-    DISTRHO_LEAK_DETECTOR(NanoKnob)
+    
+    int historyHead, history;
+    void drawOutput();
+    void drawInput();
+    void drawGainReduction();
+    std::vector<float> fInVolumeHistory;
+    std::vector<float> fOutVolumeHistory;
+    std::vector<float> fGainReductionHistory;
+    DISTRHO_LEAK_DETECTOR(NanoHistogram)
 };
 
 END_NAMESPACE_DISTRHO

@@ -17,6 +17,7 @@
 #include "DistrhoPluginInfo.h"
 #include "DistrhoPlugin.hpp"
 #include "CharacterCompressor.hpp"
+#include <chrono>
 
 START_NAMESPACE_DISTRHO
 
@@ -29,6 +30,7 @@ public:
         : Plugin(parameterCount, 0, 0)
     {
         ccDSP.init(getSampleRate());
+        //newTime = std::chrono::high_resolution_clock::now();
     }
 
 protected:
@@ -126,7 +128,9 @@ protected:
         case p_output:
             return fOutput;
             break;
-
+        case p_gainReduction:
+            return ccDSP.get_parameter(p_gainReduction);
+            break;
         default:
             return ccDSP.get_parameter(index);
         }
@@ -190,6 +194,15 @@ protected:
 private:
     CharacterCompressor ccDSP;
     float fInput, fOutput;
+    //std::chrono::high_resolution_clock::time_point oldTime, newTime;
+
+    /*  void printFPS() const
+    {
+       const std::chrono::high_resolution_clock::time_point currentime = std::chrono::high_resolution_clock::now();
+       const long int epoch = currentime.time_since_epoch().count();
+       printf("%li\n",  epoch);
+    
+    } */
 
     DISTRHO_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(CharacterCompressorPlugin)
 };

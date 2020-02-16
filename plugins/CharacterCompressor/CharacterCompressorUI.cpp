@@ -17,6 +17,7 @@
 #include "CharacterCompressUI.hpp"
 #include "dsp/CharacterCompressor.hpp"
 #include "Window.hpp"
+#include <iostream>
 
 START_NAMESPACE_DISTRHO
 
@@ -25,10 +26,12 @@ START_NAMESPACE_DISTRHO
 CharacterCompressorUI::CharacterCompressorUI()
     : UI(500, 250)
 {
+    //newTime = std::chrono::high_resolution_clock::now();
+    //oldTime = newTime;
+
+    //CharacterCompressor* plugin = static_cast<CharacterCompressor*> (getPluginInstancePointer() );
     Window &pw = getParentWindow();
     pw.addIdleCallback(this);
-
-    historyHead = 0;
     loadSharedResources();
     fNanoFont = findFont(NANOVG_DEJAVU_SANS_TTF);
     const Size<uint> knobSize(80, 100);
@@ -52,6 +55,7 @@ CharacterCompressorUI::CharacterCompressorUI()
     fInGain->setValue(paramRange[p_Input_Gain].def);
     fInGain->setRange(paramRange[p_Input_Gain].min, paramRange[p_Input_Gain].max);
     fInGain->setLabel(paramNames[p_Input_Gain]);
+    fInGain->setColors(PrimaryShade1,PrimaryShade3);
 
     fThreshold = new NanoKnob(this, this);
     fThreshold->setId(p_Threshold);
@@ -61,6 +65,7 @@ CharacterCompressorUI::CharacterCompressorUI()
     fThreshold->setValue(paramRange[p_Threshold].def);
     fThreshold->setRange(paramRange[p_Threshold].min, paramRange[p_Threshold].max);
     fThreshold->setLabel(paramNames[p_Threshold]);
+    fThreshold->setColors(Secondary1Shade1,Secondary1Shade0);
 
     fAttack = new NanoKnob(this, this);
     fAttack->setId(p_Attack);
@@ -70,6 +75,7 @@ CharacterCompressorUI::CharacterCompressorUI()
     fAttack->setValue(paramRange[p_Attack].def);
     fAttack->setRange(paramRange[p_Attack].min, paramRange[p_Attack].max);
     fAttack->setLabel(paramNames[p_Attack]);
+    fAttack->setColors(Secondary2Shade1,Secondary2Shade3);
 
     fRelease = new NanoKnob(this, this);
     fRelease->setId(p_Release);
@@ -79,6 +85,13 @@ CharacterCompressorUI::CharacterCompressorUI()
     fRelease->setValue(paramRange[p_Release].def);
     fRelease->setRange(paramRange[p_Release].min, paramRange[p_Release].max);
     fRelease->setLabel(paramNames[p_Release]);
+    fRelease->setColors(Secondary1Shade1,Secondary2Shade3);
+
+    fHistogram = new NanoHistogram(this);
+    fHistogram->setId(999); // FIX MAGIC NUMBER
+    fHistogram->setHistoryLength(500);
+    fHistogram->setSize(500, 60);
+    fHistogram->setAbsolutePos(0, 250 - 60);
 }
 
 void CharacterCompressorUI::parameterChanged(uint32_t index, float value)
@@ -100,6 +113,7 @@ void CharacterCompressorUI::parameterChanged(uint32_t index, float value)
             fdBOutput = -60;
 
         fOutputLevel = value;
+        //printFPS();
 
         break;
     }
@@ -111,6 +125,15 @@ void CharacterCompressorUI::parameterChanged(uint32_t index, float value)
             fdBInput = -60;
         break;
     }
+    case p_Threshold:
+        fThreshold->setValue(value);
+        break;
+    case p_Attack:
+        fAttack->setValue(value);
+        break;
+    case p_Release:
+        fRelease->setValue(value);
+        break;
     default:
         break;
     }
@@ -125,63 +148,12 @@ void CharacterCompressorUI::onNanoDisplay()
     rect(0, 0, w, h);
     fill();
     closePath();
-    char buffer[32];
-    beginPath();
-    sprintf(buffer, "%.1f", fdBInput);
-    fontSize(16);
-    textAlign(ALIGN_MIDDLE | ALIGN_TOP);
-    fontFaceId(fNanoFont);
-    fillColor(255, 255, 255, 255);
-    text(50, 150, buffer, NULL);
-    closePath();
-    // line input
-    beginPath();
-    strokeWidth(1.0f);
-    strokeColor(255, 0, 0);
-    moveTo(0, h - 60 - fInVolumeHistory[historyHead]);
-    for (int i = 1, j; i < 500; i++)
-    {
-        j = (i + historyHead) % 500;
-        lineTo(i, h - 60 - fInVolumeHistory[j]);
-    }
-    stroke();
-    closePath();
-    // line output
-    beginPath();
-    strokeWidth(1.0f);
-    strokeColor(0, 255, 0);
-    moveTo(0, h - 60 - fOutVolumeHistory[historyHead]);
-    for (int i = 1, j; i < 500; i++)
-    {
-        j = (i + historyHead) % 500;
-        lineTo(i, h - 60 - fOutVolumeHistory[j]);
-    }
-    stroke();
-    closePath();
-
-    // line gain reduction
-    beginPath();
-    strokeWidth(1.0f);
-    strokeColor(0, 255, 255);
-    moveTo(0, h - 60 - fGainReductionHistory[historyHead]);
-    for (int i = 1, j; i < 500; i++)
-    {
-        j = (i + historyHead) % 500;
-        lineTo(i, h - 60 - fGainReductionHistory[j]);
-    }
-    stroke();
-    closePath();
-
-
 }
 
 void CharacterCompressorUI::idleCallback()
 {
-    fInVolumeHistory[historyHead] = fdBInput;
-    fOutVolumeHistory[historyHead] = fdBOutput;
-    fGainReductionHistory[historyHead] = fdBGainReduction;
-    historyHead++;
-    historyHead %= 500;
+    // printf("setValues(%f,%f,f%\n", fdBInput,fdBOutput,fdBGainReduction);
+    fHistogram->setValues(fdBInput, fdBOutput, fdBGainReduction);
     repaint();
 }
 
@@ -191,6 +163,15 @@ void CharacterCompressorUI::nanoKnobValueChanged(NanoKnob *knob, const float val
     int KnobId = knob->getId();
     setParameterValue(KnobId, value);
 }
+
+/* void CharacterCompressorUI::printFPS()
+{
+    newTime = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed_seconds = newTime-oldTime;
+    float fps = 1/elapsed_seconds.count();
+    printf("elapsed =%f\n",fps);
+    oldTime = newTime;
+} */
 
 UI *createUI()
 {
