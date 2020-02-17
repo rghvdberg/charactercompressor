@@ -1,3 +1,7 @@
 .vscode/settings.json
 
 .vscode/
+
+bin/
+
+build/
