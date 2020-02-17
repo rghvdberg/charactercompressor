@@ -47,16 +47,14 @@ CharacterCompressorUI::CharacterCompressorUI()
     fNanoMeter->setRange(paramRange[p_gainReduction].min, paramRange[p_gainReduction].max);
     fNanoMeter->setValue(paramRange[p_gainReduction].def);
 
-    fInGain = new NanoKnob(this, this);
+    fInGain = new NanoSlider(this, this);
     fInGain->setId(p_Input_Gain);
     fInGain->setAbsolutePos(knob_x, knob_y);
-    fInGain->setSize(knobSize);
-    fInGain->setRadius(knobRadius);
+    fInGain->setSize(20,100);
     fInGain->setValue(paramRange[p_Input_Gain].def);
     fInGain->setRange(paramRange[p_Input_Gain].min, paramRange[p_Input_Gain].max);
     fInGain->setLabel(paramNames[p_Input_Gain]);
-    fInGain->setColors(PrimaryShade1,PrimaryShade3);
-
+  
     fThreshold = new NanoKnob(this, this);
     fThreshold->setId(p_Threshold);
     fThreshold->setAbsolutePos(knob_x + knob_x_spacing * 1, knob_y);
@@ -162,6 +160,13 @@ void CharacterCompressorUI::nanoKnobValueChanged(NanoKnob *knob, const float val
 {
     int KnobId = knob->getId();
     setParameterValue(KnobId, value);
+}
+
+void CharacterCompressorUI::nanoSliderValueChanged(NanoSlider *slider, const float value)
+
+{
+    int SliderId = slider->getId();
+    setParameterValue(SliderId, value);
 }
 
 /* void CharacterCompressorUI::printFPS()

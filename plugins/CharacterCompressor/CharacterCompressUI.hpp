@@ -20,6 +20,7 @@
 #include "Widgets/NanoMeter.hpp"
 #include "Widgets/NanoKnob.hpp"
 #include "Widgets/NanoHistogram.hpp"
+#include "Widgets/NanoSlider.hpp"
 #include "Resources/Colors.hpp"
 #include <chrono>
 
@@ -29,6 +30,7 @@ START_NAMESPACE_DISTRHO
 
 class CharacterCompressorUI : public UI,
     public NanoKnob::Callback,
+    public NanoSlider::Callback,
     public IdleCallback
 {
 public: 
@@ -38,12 +40,14 @@ protected:
     void parameterChanged(uint32_t index, float value) override;
     void onNanoDisplay() override;
     void nanoKnobValueChanged( NanoKnob* nanoKnob, const float value) override;
+    void nanoSliderValueChanged( NanoSlider* nanoSlider, const float value) override;
     void idleCallback() override;
 private:
     
     ScopedPointer<NanoMeter> fNanoMeter;
-    ScopedPointer<NanoKnob> fInGain,fThreshold,fRatio,fAttack,fRelease;
+    ScopedPointer<NanoKnob> fThreshold,fRatio,fAttack,fRelease;
     ScopedPointer<NanoHistogram> fHistogram;
+    ScopedPointer<NanoSlider> fInGain;
     FontId fNanoFont;
     float fInputLevel, fOutputLevel, fdBInput, fdBOutput, fdBGainReduction;
 //    void printFPS();
