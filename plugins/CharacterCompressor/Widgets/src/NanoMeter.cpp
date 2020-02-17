@@ -33,7 +33,7 @@ NanoMeter::NanoMeter(Widget* parent)
 
 void NanoMeter::onNanoDisplay()
 {
-float normValue = (fValue-fMin) / (fMax - fMin);
+float normValue = 1 - (fValue-fMin) / (fMax - fMin);
 auto w = getWidth();
 auto h = getHeight();
 auto meterHeight = normValue * h;
@@ -47,7 +47,7 @@ closePath();
 // meter
 beginPath();
 fillColor(0,128,0,255);
-rect (0,h-meterHeight,w,meterHeight);
+rect (0,0,w,meterHeight);
 fill();
 closePath();
 }
