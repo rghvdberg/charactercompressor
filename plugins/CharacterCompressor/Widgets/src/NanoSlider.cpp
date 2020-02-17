@@ -44,21 +44,20 @@ void NanoSlider::onNanoDisplay()
     auto margin = 1.0f;
     const float handleHeight = std::max(h/10.0f,2.0f);
     const float range = h - handleHeight;
-    printf("handleHeigth %f, range %f, value%f\n",handleHeight,range, normValue*range);
     handle.setSize(w,handleHeight);
     handle.setPos(0, range * normValue);
    
     // Slider
     beginPath();
     fillColor(64, 64, 64, 255);
-    roundedRect(0,0,w,h,2);
+    roundedRect(0.0f,0.0f,w,h,2.0f);
     fill();
     closePath();
 
     // Handle
     beginPath();
-    fillColor(Color(255,0,0));
-    rect (0,range * normValue, w, handleHeight);
+    fillColor(cHandle);
+    roundedRect (0,range * normValue, w, handleHeight, 2.0f);
     fill();
     closePath();
 
@@ -123,6 +122,11 @@ void NanoSlider::setLabel(std::string label)
     Label = label;
 }
 
+void NanoSlider::setColor(Color color)
+{
+    cHandle = color;
+}
+
 float NanoSlider::getValue() const
 {
     return fValue;
@@ -147,6 +151,10 @@ bool NanoSlider::onMouse(const MouseEvent &ev)
 
 bool NanoSlider::onMotion(const MotionEvent &ev)
 {
+    if (contains(ev.pos))
+    {
+        
+    }
     if (mouseDown)
     {
         const float resistance = 200.0f;
@@ -164,8 +172,8 @@ bool NanoSlider::onScroll(const ScrollEvent &ev)
 {
     if (!contains(ev.pos))
         return false;
-    float delta = ev.delta.getY() * (fMax - fMin) / 50;
-    setValue(fValue + delta);
+    float delta = ev.delta.getY() * (fMax - fMin) / 20;
+    setValue(fValue - delta);
     fCallback->nanoSliderValueChanged(this, fValue);
     return true;
 }

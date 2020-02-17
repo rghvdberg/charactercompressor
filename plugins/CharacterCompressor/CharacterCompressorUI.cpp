@@ -54,6 +54,7 @@ CharacterCompressorUI::CharacterCompressorUI()
     fInGain->setValue(paramRange[p_Input_Gain].def);
     fInGain->setRange(paramRange[p_Input_Gain].min, paramRange[p_Input_Gain].max);
     fInGain->setLabel(paramNames[p_Input_Gain]);
+    fInGain->setColor(Secondary1Shade1);
   
     fThreshold = new NanoKnob(this, this);
     fThreshold->setId(p_Threshold);
@@ -167,6 +168,11 @@ void CharacterCompressorUI::nanoSliderValueChanged(NanoSlider *slider, const flo
 {
     int SliderId = slider->getId();
     setParameterValue(SliderId, value);
+}
+
+void CharacterCompressorUI::sliderHasMouse(NanoSlider *slider, const bool hasMouse)
+{
+    printf("widget %i has mouse %s\n", slider->getId(),hasMouse?"yes":"no");
 }
 
 /* void CharacterCompressorUI::printFPS()

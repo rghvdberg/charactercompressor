@@ -34,6 +34,7 @@ public:
     public:
         virtual ~Callback() {}
         virtual void nanoSliderValueChanged(NanoSlider *slider, float value) = 0;
+        virtual void sliderHasMouse(NanoSlider *slider, bool hasMouse) = 0;
     };
     explicit NanoSlider(Widget *parent, Callback *cb);
 
@@ -41,7 +42,7 @@ public:
     void setValue(float value);
     void setRange(float min, float max);
     void setLabel(std::string lable);
-   // void setColors(Color value, Color range);
+    void setColor(Color color);
 
 protected:
     void onNanoDisplay() override;
@@ -60,7 +61,8 @@ private:
     Point<int> mousePoint;
     FontId fNanoFont;
     Rectangle<int> handle;
-    Color cValue, cRange;
+    Color cHandle;
+    uint timer;
 
     DISTRHO_LEAK_DETECTOR(NanoSlider)
 };

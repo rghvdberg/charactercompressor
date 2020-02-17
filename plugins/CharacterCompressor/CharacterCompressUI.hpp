@@ -41,6 +41,7 @@ protected:
     void onNanoDisplay() override;
     void nanoKnobValueChanged( NanoKnob* nanoKnob, const float value) override;
     void nanoSliderValueChanged( NanoSlider* nanoSlider, const float value) override;
+    void sliderHasMouse( NanoSlider* nanoSlider, const bool hasMouse) override;
     void idleCallback() override;
 private:
     
