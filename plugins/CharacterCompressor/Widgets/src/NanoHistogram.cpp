@@ -110,7 +110,17 @@ void NanoHistogram::drawGainReduction()
 {
     const auto w = getWidth();
     const auto h = getHeight();
-    const Paint bg = linearGradient(w / 2, 0, w / 2, h, Secondary2Shade0, Secondary2Shade4);
+    const float r1 = Secondary2Shade0.red;
+    const float g1 = Secondary2Shade0.green;
+    const float b1 = Secondary2Shade0.blue;
+    const float r2 = Secondary2Shade4.red;
+    const float g2 = Secondary2Shade4.green;
+    const float b2 = Secondary2Shade4.blue;
+    const Color col1 = Color(r1,g1,b1,0.8f);
+    const Color col2 = Color(r2,g2,b2,0.8f);
+  
+
+    const Paint bg = linearGradient(w / 2, 0, w / 2, h, col1, col2);
     beginPath();
     strokeColor(Secondary2Shade1);
     strokeWidth(1.0f);
