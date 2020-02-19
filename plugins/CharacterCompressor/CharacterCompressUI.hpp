@@ -31,7 +31,8 @@ START_NAMESPACE_DISTRHO
 class CharacterCompressorUI : public UI,
     public NanoKnob::Callback,
     public NanoSlider::Callback,
-    public IdleCallback
+    public IdleCallback,
+    public CbWidget::PopUp
 {
 public: 
     CharacterCompressorUI();
@@ -41,8 +42,9 @@ protected:
     void onNanoDisplay() override;
     void nanoKnobValueChanged( NanoKnob* nanoKnob, const float value) override;
     void nanoSliderValueChanged( NanoSlider* nanoSlider, const float value) override;
-    void sliderHasMouse( NanoSlider* nanoSlider, const bool hasMouse) override;
+    void cbPopUp( CbWidget* widget, const bool hasMouse, const Point<int> mouse) override;
     void idleCallback() override;
+    bool onMotion( const MotionEvent &ev) override;
 private:
     
     ScopedPointer<NanoMeter> fNanoMeter;
@@ -51,12 +53,15 @@ private:
     ScopedPointer<NanoSlider> fInGain;
     FontId fNanoFont;
     float fInputLevel, fOutputLevel, fdBInput, fdBOutput, fdBGainReduction;
+    Point<int> popUp; 
 //    void printFPS();
-//    std::chrono::high_resolution_clock::time_point oldTime,newTime;
-
+    std::chrono::high_resolution_clock::time_point oldTime,newTime;
+    CbWidget * widgetHasMouse;
+      
     // Parameters
 
     DISTRHO_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(CharacterCompressorUI)
 };
+
 
 END_NAMESPACE_DISTRHO

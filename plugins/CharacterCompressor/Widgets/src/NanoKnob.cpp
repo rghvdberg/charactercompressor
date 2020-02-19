@@ -23,7 +23,7 @@
 START_NAMESPACE_DISTRHO
 
 NanoKnob::NanoKnob(Widget *parent, Callback *cb)
-    : NanoWidget(parent),
+    : CbWidget(parent),
       fValue(0.0f),
       fMin(0.0f),
       fMax(1.0f),
@@ -172,6 +172,22 @@ bool NanoKnob::onMouse(const MouseEvent &ev)
 
 bool NanoKnob::onMotion(const MotionEvent &ev)
 {
+    if (contains(ev.pos))
+
+    {
+        ptrHasMouse = this;
+        printf("id = %u\n", ptrHasMouse->getId());
+    }
+    else
+    {
+        if (ptrHasMouse)
+        {
+            
+            if (ptrHasMouse->getId() == getId())
+                ptrHasMouse = nullptr;
+        }
+    }
+
     if (mouseDown)
     {
         const float resistance = 100.0f;

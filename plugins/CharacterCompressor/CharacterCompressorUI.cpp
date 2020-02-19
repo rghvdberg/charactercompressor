@@ -26,10 +26,7 @@ START_NAMESPACE_DISTRHO
 CharacterCompressorUI::CharacterCompressorUI()
     : UI(500, 250)
 {
-    //newTime = std::chrono::high_resolution_clock::now();
-    //oldTime = newTime;
-
-    //CharacterCompressor* plugin = static_cast<CharacterCompressor*> (getPluginInstancePointer() );
+    widgetHasMouse = nullptr;
     Window &pw = getParentWindow();
     pw.addIdleCallback(this);
     loadSharedResources();
@@ -40,6 +37,8 @@ CharacterCompressorUI::CharacterCompressorUI()
     const int knob_x = 40;
     const int knob_y = 20;
 
+    newTime = std::chrono::high_resolution_clock::now();
+    oldTime = newTime;
     fNanoMeter = new NanoMeter(this);
     fNanoMeter->setId(p_gainReduction);
     fNanoMeter->setAbsolutePos(10, 10);
@@ -47,15 +46,16 @@ CharacterCompressorUI::CharacterCompressorUI()
     fNanoMeter->setRange(paramRange[p_gainReduction].min, paramRange[p_gainReduction].max);
     fNanoMeter->setValue(paramRange[p_gainReduction].def);
 
-    fInGain = new NanoSlider(this, this);
+    fInGain = new NanoSlider(this, this, this);
     fInGain->setId(p_Input_Gain);
     fInGain->setAbsolutePos(knob_x, knob_y);
-    fInGain->setSize(20,100);
+    fInGain->setSize(20, 100);
     fInGain->setValue(paramRange[p_Input_Gain].def);
     fInGain->setRange(paramRange[p_Input_Gain].min, paramRange[p_Input_Gain].max);
     fInGain->setLabel(paramNames[p_Input_Gain]);
     fInGain->setColor(Secondary1Shade1);
-  
+    //fInGain->setPtrHasMouse(nullptr);
+    
     fThreshold = new NanoKnob(this, this);
     fThreshold->setId(p_Threshold);
     fThreshold->setAbsolutePos(knob_x + knob_x_spacing * 1, knob_y);
@@ -64,7 +64,8 @@ CharacterCompressorUI::CharacterCompressorUI()
     fThreshold->setValue(paramRange[p_Threshold].def);
     fThreshold->setRange(paramRange[p_Threshold].min, paramRange[p_Threshold].max);
     fThreshold->setLabel(paramNames[p_Threshold]);
-    fThreshold->setColors(Secondary1Shade1,Secondary1Shade0);
+    fThreshold->setColors(Secondary1Shade1, Secondary1Shade0);
+    //fThreshold->setPtrHasMouse(&widgetHasMouse);
 
     fAttack = new NanoKnob(this, this);
     fAttack->setId(p_Attack);
@@ -74,7 +75,8 @@ CharacterCompressorUI::CharacterCompressorUI()
     fAttack->setValue(paramRange[p_Attack].def);
     fAttack->setRange(paramRange[p_Attack].min, paramRange[p_Attack].max);
     fAttack->setLabel(paramNames[p_Attack]);
-    fAttack->setColors(Secondary2Shade1,Secondary2Shade3);
+    fAttack->setColors(Secondary2Shade1, Secondary2Shade3);
+    //fAttack->setPtrHasMouse(&widgetHasMouse);
 
     fRelease = new NanoKnob(this, this);
     fRelease->setId(p_Release);
@@ -84,7 +86,8 @@ CharacterCompressorUI::CharacterCompressorUI()
     fRelease->setValue(paramRange[p_Release].def);
     fRelease->setRange(paramRange[p_Release].min, paramRange[p_Release].max);
     fRelease->setLabel(paramNames[p_Release]);
-    fRelease->setColors(Secondary1Shade1,Secondary2Shade3);
+    fRelease->setColors(Secondary1Shade1, Secondary2Shade3);
+    //fRelease->setPtrHasMouse(&widgetHasMouse);
 
     fHistogram = new NanoHistogram(this);
     fHistogram->setId(999); // FIX MAGIC NUMBER
@@ -151,8 +154,18 @@ void CharacterCompressorUI::onNanoDisplay()
 
 void CharacterCompressorUI::idleCallback()
 {
-    // printf("setValues(%f,%f,f%\n", fdBInput,fdBOutput,fdBGainReduction);
     fHistogram->setValues(fdBInput, fdBOutput, fdBGainReduction);
+    if (widgetHasMouse)
+    {
+        printf("widget %u has mouse\n",widgetHasMouse->getId());
+    }
+    // if timer > xxx
+    /* newTime = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<float> elapsed_seconds = newTime - oldTime;
+    if ( (elapsed_seconds.count() > 2.0f))
+       printf("time to popUp %f\n", elapsed_seconds.count()); */
+     //  printf ("widget that has the mouse = %i\n", widgetHasMouse);
+
     repaint();
 }
 
@@ -170,9 +183,32 @@ void CharacterCompressorUI::nanoSliderValueChanged(NanoSlider *slider, const flo
     setParameterValue(SliderId, value);
 }
 
-void CharacterCompressorUI::sliderHasMouse(NanoSlider *slider, const bool hasMouse)
+void CharacterCompressorUI::cbPopUp(CbWidget *cbWidget, const bool hasMouse, const Point<int> mouse)
 {
-    printf("widget %i has mouse %s\n", slider->getId(),hasMouse?"yes":"no");
+    //printf("widget %i has mouse %s\n", slider->getId(), hasMouse ? "yes" : "no");
+    if (hasMouse)
+    {
+        // store x,y
+        popUp = mouse;
+       //printf ("id = %i\n", cbWidget->getId());
+        // set timer
+       // oldTime = std::chrono::high_resolution_clock::now();
+    }
+    else
+    {
+        // reset timer
+        // disable popup
+        ;
+    }
+}
+
+bool CharacterCompressorUI::onMotion(const MotionEvent &ev)
+{
+        oldTime = std::chrono::high_resolution_clock::now();
+       // popUp = ev.pos;
+    
+
+    return true;
 }
 
 /* void CharacterCompressorUI::printFPS()

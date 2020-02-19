@@ -22,18 +22,19 @@
 
 START_NAMESPACE_DISTRHO
 
-NanoSlider::NanoSlider(Widget *parent, Callback *cb)
-    : NanoWidget(parent),
+NanoSlider::NanoSlider(Widget *widget, Callback *cb, PopUp *pu)
+    : CbWidget(widget),
       fValue(0.0f),
       fMin(0.0f),
       fMax(1.0f),
       fCallback(cb),
-      mouseDown(false)
+      mouseDown(false),
+      fPopUp(pu)
 {
     loadSharedResources();
     fNanoFont = findFont(NANOVG_DEJAVU_SANS_TTF);
-    handle.setPos(0,0);
-    handle.setSize(getWidth(),2);
+    handle.setPos(0, 0);
+    handle.setSize(getWidth(), 2);
 }
 
 void NanoSlider::onNanoDisplay()
@@ -42,27 +43,26 @@ void NanoSlider::onNanoDisplay()
     auto w = getWidth();
     auto h = getHeight();
     auto margin = 1.0f;
-    const float handleHeight = std::max(h/10.0f,2.0f);
+    const float handleHeight = std::max(h / 10.0f, 2.0f);
     const float range = h - handleHeight;
-    handle.setSize(w,handleHeight);
+    handle.setSize(w, handleHeight);
     handle.setPos(0, range * normValue);
-   
+
     // Slider
     beginPath();
     fillColor(64, 64, 64, 255);
-    roundedRect(0.0f,0.0f,w,h,2.0f);
+    roundedRect(0.0f, 0.0f, w, h, 2.0f);
     fill();
     closePath();
 
     // Handle
     beginPath();
     fillColor(cHandle);
-    roundedRect (0,range * normValue, w, handleHeight, 2.0f);
+    roundedRect(0, range * normValue, w, handleHeight, 2.0f);
     fill();
     closePath();
 
-   
-   /*  //Label
+    /*  //Label
     beginPath();
     fontFaceId(fNanoFont);
     fontSize(14);
@@ -151,10 +151,22 @@ bool NanoSlider::onMouse(const MouseEvent &ev)
 
 bool NanoSlider::onMotion(const MotionEvent &ev)
 {
+
     if (contains(ev.pos))
+
     {
-        
+        ptrHasMouse = this;
+        printf("id = %u\n", ptrHasMouse->getId());
     }
+    else
+    {
+       if (ptrHasMouse)
+        {
+            if (ptrHasMouse->getId() == getId())
+                ptrHasMouse = nullptr;
+        }
+    }
+
     if (mouseDown)
     {
         const float resistance = 200.0f;

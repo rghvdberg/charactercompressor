@@ -19,7 +19,8 @@ FILES_UI  = CharacterCompressorUI.cpp \
 			Widgets/src/NanoMeter.cpp \
 			Widgets/src/NanoKnob.cpp \
 			Widgets/src/NanoHistogram.cpp \
-			Widgets/src/NanoSlider.cpp
+			Widgets/src/NanoSlider.cpp \
+			Widgets/src/CbWidget.cpp
 
 # --------------------------------------------------------------
 # Do some magic

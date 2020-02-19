@@ -22,11 +22,12 @@
 
 #include "Widget.hpp"
 #include "NanoVG.hpp"
+#include "CbWidget.hpp"
 #include <string>
 
 START_NAMESPACE_DISTRHO
 
-class NanoKnob : public NanoWidget
+class NanoKnob : public CbWidget
 {
 public:
     class Callback

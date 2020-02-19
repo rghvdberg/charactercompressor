@@ -22,11 +22,12 @@
 
 #include "Widget.hpp"
 #include "NanoVG.hpp"
+#include "CbWidget.hpp"
 #include <string>
 
 START_NAMESPACE_DISTRHO
 
-class NanoSlider : public NanoWidget
+class NanoSlider : public CbWidget
 {
 public:
     class Callback
@@ -34,9 +35,8 @@ public:
     public:
         virtual ~Callback() {}
         virtual void nanoSliderValueChanged(NanoSlider *slider, float value) = 0;
-        virtual void sliderHasMouse(NanoSlider *slider, bool hasMouse) = 0;
     };
-    explicit NanoSlider(Widget *parent, Callback *cb);
+    explicit NanoSlider(Widget *parent, Callback *cb, PopUp * pu);
 
     float getValue() const;
     void setValue(float value);
@@ -57,12 +57,14 @@ private:
     float fRadius;
     std::string Label;
     Callback *const fCallback;
+    PopUp   *const fPopUp;
     bool mouseDown;
     Point<int> mousePoint;
     FontId fNanoFont;
     Rectangle<int> handle;
     Color cHandle;
     uint timer;
+    bool hasMouse;
 
     DISTRHO_LEAK_DETECTOR(NanoSlider)
 };
