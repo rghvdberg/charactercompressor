@@ -53,7 +53,6 @@ void CbWidget::setValue(float value)
 
 void CbWidget::setRange(float min, float max)
 {
-  printf("widget %u : fMin %f, fMax %f\n", getId(), min, max);
   fMin = min;
   fMax = max;
 }
