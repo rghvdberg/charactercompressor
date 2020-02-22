@@ -13,21 +13,20 @@ void ToolTip::onNanoDisplay()
 {
     auto w = getWidth();
     auto h = getHeight();
-  //  printf("w %u, h %u\n",w,h);
     beginPath();
-    fillColor(0.0f, 0.0f, 0.0f, .8f);
+    fillColor(0.0f, 0.0f, 0.0f, .7f);
     strokeColor(255, 255, 255);
-    rect(0, 0, w, h);
+    rect(0, 0, w, h );
     fill();
     stroke();
     closePath();
     //Label
     beginPath();
     fontFaceId(fNanoFont);
-    textAlign( ALIGN_TOP);
+    textAlign( ALIGN_CENTER | ALIGN_TOP);
     fontSize(14);
     fillColor(255, 255, 255, 255);
-    text(0, 0, Label.c_str(), NULL);
+    text(w/2, 0, Label.c_str(), NULL);
     closePath();
 }
 

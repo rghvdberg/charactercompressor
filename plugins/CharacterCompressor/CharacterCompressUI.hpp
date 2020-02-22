@@ -54,7 +54,6 @@ private:
     FontId fNanoFont;
     float fInputLevel, fOutputLevel, fdBInput, fdBOutput, fdBGainReduction;
     Point<int> tooltipPosition;
-    void DrawToolTip();
     bool drawTooltip;
     std::chrono::high_resolution_clock::time_point oldTime,newTime;
     CbWidget * widgetPtr;

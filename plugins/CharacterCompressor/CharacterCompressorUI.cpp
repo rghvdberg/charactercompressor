@@ -45,12 +45,6 @@ CharacterCompressorUI::CharacterCompressorUI()
     newTime = std::chrono::high_resolution_clock::now();
     oldTime = newTime;
 
-    fTooltip = new ToolTip(this);
-    fTooltip->setId(888);
-    fTooltip->setAbsolutePos(100, 70);
-    fTooltip->setLabel("this is a tooltip");
-    fTooltip->setZ(0);
-
     fNanoMeter = new NanoMeter(this);
     fNanoMeter->setId(p_gainReduction);
     fNanoMeter->setAbsolutePos(10, 10);
@@ -113,7 +107,12 @@ CharacterCompressorUI::CharacterCompressorUI()
     fHistogram->setAbsolutePos(0, 250 - 60);
     fHistogram->setZ(7);
 
-
+    fTooltip = new ToolTip(this);
+    fTooltip->setId(888);
+    fTooltip->setAbsolutePos(100, 70);
+    fTooltip->setLabel("this is a tooltip");
+    fTooltip->setZ(8);
+    fTooltip->setVisible(false);
 }
 
 void CharacterCompressorUI::parameterChanged(uint32_t index, float value)
@@ -171,7 +170,28 @@ void CharacterCompressorUI::onNanoDisplay()
     fill();
     closePath();
     if (drawTooltip && widgetPtr)
-        DrawToolTip();
+    {
+        // construnct tooltip label
+        float value = widgetPtr->getValue();
+        uint id = widgetPtr->getId();
+        const char *unit = parameterUnits[id];
+        const char *name = paramNames[id];
+        char buffer[32];
+        sprintf(buffer, "%s : %.1f %s", name, value, unit);
+        const std::string label = buffer;
+        fTooltip->setLabel(label);
+        // check if tooltip doesn't go offscreen
+        // TODO check top and bottom of UI
+        fTooltip->setAbsolutePos(tooltipPosition);
+        const auto tt_width = fTooltip->getWidth();
+        const auto ui_width = getWidth();
+        if ((tooltipPosition.getX() + tt_width) > ui_width)
+            fTooltip->setAbsoluteX(ui_width - tt_width);
+        fTooltip->setVisible(true);
+    }
+
+    else
+        fTooltip->setVisible(false);
 }
 
 void CharacterCompressorUI::idleCallback()
@@ -202,35 +222,10 @@ bool CharacterCompressorUI::onMotion(const MotionEvent &ev)
 {
     oldTime = std::chrono::high_resolution_clock::now();
     tooltipPosition = ev.pos;
+    const uint toolTipY = tooltipPosition.getY() - 20;
+    tooltipPosition.setY(toolTipY);
     drawTooltip = false;
     return true;
-}
-
-void CharacterCompressorUI::DrawToolTip()
-{
-    Rectangle<float> bounds;
-    const float x = tooltipPosition.getX();
-    const float y = tooltipPosition.getY();
-    char buffer[32];
-    sprintf(buffer, "widget %i had value %.3f", widgetPtr->getId(), widgetPtr->getValue());
-    fontSize(14);
-    textAlign(ALIGN_MIDDLE | ALIGN_TOP);
-    textBounds(0, 0, buffer, NULL, bounds);
-
-    //  const char *text = "this is a tooltip";
-
-    fillColor(255, 255, 255, 64);
-    strokeColor(255, 255, 255, 255);
-    beginPath();
-    rect(x, y, bounds.getWidth(), bounds.getHeight());
-    fill();
-    stroke();
-    closePath();
-    beginPath();
-    fontFaceId(fNanoFont);
-    fillColor(255, 255, 255, 255);
-    text(x, y, buffer, NULL);
-    closePath();
 }
 
 UI *createUI()
