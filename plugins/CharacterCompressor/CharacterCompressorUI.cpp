@@ -26,7 +26,12 @@ START_NAMESPACE_DISTRHO
 CharacterCompressorUI::CharacterCompressorUI()
     : UI(500, 250)
 {
-    widgetHasMouse = nullptr;
+
+    widgetPtr = nullptr;
+    dblWidgetPtr = &widgetPtr;
+
+    drawTooltip = false;
+
     Window &pw = getParentWindow();
     pw.addIdleCallback(this);
     loadSharedResources();
@@ -39,14 +44,22 @@ CharacterCompressorUI::CharacterCompressorUI()
 
     newTime = std::chrono::high_resolution_clock::now();
     oldTime = newTime;
+
+    fTooltip = new ToolTip(this);
+    fTooltip->setId(888);
+    fTooltip->setAbsolutePos(100, 70);
+    fTooltip->setLabel("this is a tooltip");
+    fTooltip->setZ(0);
+
     fNanoMeter = new NanoMeter(this);
     fNanoMeter->setId(p_gainReduction);
     fNanoMeter->setAbsolutePos(10, 10);
     fNanoMeter->setSize(10, knobSize.getHeight());
     fNanoMeter->setRange(paramRange[p_gainReduction].min, paramRange[p_gainReduction].max);
     fNanoMeter->setValue(paramRange[p_gainReduction].def);
+    fNanoMeter->setZ(2);
 
-    fInGain = new NanoSlider(this, this, this);
+    fInGain = new NanoSlider(this, this);
     fInGain->setId(p_Input_Gain);
     fInGain->setAbsolutePos(knob_x, knob_y);
     fInGain->setSize(20, 100);
@@ -54,8 +67,9 @@ CharacterCompressorUI::CharacterCompressorUI()
     fInGain->setRange(paramRange[p_Input_Gain].min, paramRange[p_Input_Gain].max);
     fInGain->setLabel(paramNames[p_Input_Gain]);
     fInGain->setColor(Secondary1Shade1);
-    //fInGain->setPtrHasMouse(nullptr);
-    
+    fInGain->setPtrHasMouse(dblWidgetPtr);
+    fInGain->setZ(3);
+
     fThreshold = new NanoKnob(this, this);
     fThreshold->setId(p_Threshold);
     fThreshold->setAbsolutePos(knob_x + knob_x_spacing * 1, knob_y);
@@ -65,18 +79,20 @@ CharacterCompressorUI::CharacterCompressorUI()
     fThreshold->setRange(paramRange[p_Threshold].min, paramRange[p_Threshold].max);
     fThreshold->setLabel(paramNames[p_Threshold]);
     fThreshold->setColors(Secondary1Shade1, Secondary1Shade0);
-    //fThreshold->setPtrHasMouse(&widgetHasMouse);
+    fThreshold->setPtrHasMouse(dblWidgetPtr);
+    fThreshold->setZ(4);
 
     fAttack = new NanoKnob(this, this);
     fAttack->setId(p_Attack);
     fAttack->setAbsolutePos(knob_x + knob_x_spacing * 3, knob_y);
     fAttack->setSize(knobSize);
     fAttack->setRadius(knobRadius);
-    fAttack->setValue(paramRange[p_Attack].def);
     fAttack->setRange(paramRange[p_Attack].min, paramRange[p_Attack].max);
+    fAttack->setValue(paramRange[p_Attack].def);
     fAttack->setLabel(paramNames[p_Attack]);
     fAttack->setColors(Secondary2Shade1, Secondary2Shade3);
-    //fAttack->setPtrHasMouse(&widgetHasMouse);
+    fAttack->setPtrHasMouse(dblWidgetPtr);
+    fAttack->setZ(5);
 
     fRelease = new NanoKnob(this, this);
     fRelease->setId(p_Release);
@@ -87,13 +103,17 @@ CharacterCompressorUI::CharacterCompressorUI()
     fRelease->setRange(paramRange[p_Release].min, paramRange[p_Release].max);
     fRelease->setLabel(paramNames[p_Release]);
     fRelease->setColors(Secondary1Shade1, Secondary2Shade3);
-    //fRelease->setPtrHasMouse(&widgetHasMouse);
+    fRelease->setPtrHasMouse(dblWidgetPtr);
+    fRelease->setZ(6);
 
     fHistogram = new NanoHistogram(this);
     fHistogram->setId(999); // FIX MAGIC NUMBER
     fHistogram->setHistoryLength(500);
     fHistogram->setSize(500, 60);
     fHistogram->setAbsolutePos(0, 250 - 60);
+    fHistogram->setZ(7);
+
+
 }
 
 void CharacterCompressorUI::parameterChanged(uint32_t index, float value)
@@ -150,22 +170,17 @@ void CharacterCompressorUI::onNanoDisplay()
     rect(0, 0, w, h);
     fill();
     closePath();
+    if (drawTooltip && widgetPtr)
+        DrawToolTip();
 }
 
 void CharacterCompressorUI::idleCallback()
 {
     fHistogram->setValues(fdBInput, fdBOutput, fdBGainReduction);
-    if (widgetHasMouse)
-    {
-        printf("widget %u has mouse\n",widgetHasMouse->getId());
-    }
-    // if timer > xxx
-    /* newTime = std::chrono::high_resolution_clock::now();
+    newTime = std::chrono::high_resolution_clock::now();
     std::chrono::duration<float> elapsed_seconds = newTime - oldTime;
-    if ( (elapsed_seconds.count() > 2.0f))
-       printf("time to popUp %f\n", elapsed_seconds.count()); */
-     //  printf ("widget that has the mouse = %i\n", widgetHasMouse);
-
+    if ((elapsed_seconds.count() > 1.0f))
+        widgetPtr ? drawTooltip = true : drawTooltip = false;
     repaint();
 }
 
@@ -183,42 +198,40 @@ void CharacterCompressorUI::nanoSliderValueChanged(NanoSlider *slider, const flo
     setParameterValue(SliderId, value);
 }
 
-void CharacterCompressorUI::cbPopUp(CbWidget *cbWidget, const bool hasMouse, const Point<int> mouse)
-{
-    //printf("widget %i has mouse %s\n", slider->getId(), hasMouse ? "yes" : "no");
-    if (hasMouse)
-    {
-        // store x,y
-        popUp = mouse;
-       //printf ("id = %i\n", cbWidget->getId());
-        // set timer
-       // oldTime = std::chrono::high_resolution_clock::now();
-    }
-    else
-    {
-        // reset timer
-        // disable popup
-        ;
-    }
-}
-
 bool CharacterCompressorUI::onMotion(const MotionEvent &ev)
 {
-        oldTime = std::chrono::high_resolution_clock::now();
-       // popUp = ev.pos;
-    
-
+    oldTime = std::chrono::high_resolution_clock::now();
+    tooltipPosition = ev.pos;
+    drawTooltip = false;
     return true;
 }
 
-/* void CharacterCompressorUI::printFPS()
+void CharacterCompressorUI::DrawToolTip()
 {
-    newTime = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double> elapsed_seconds = newTime-oldTime;
-    float fps = 1/elapsed_seconds.count();
-    printf("elapsed =%f\n",fps);
-    oldTime = newTime;
-} */
+    Rectangle<float> bounds;
+    const float x = tooltipPosition.getX();
+    const float y = tooltipPosition.getY();
+    char buffer[32];
+    sprintf(buffer, "widget %i had value %.3f", widgetPtr->getId(), widgetPtr->getValue());
+    fontSize(14);
+    textAlign(ALIGN_MIDDLE | ALIGN_TOP);
+    textBounds(0, 0, buffer, NULL, bounds);
+
+    //  const char *text = "this is a tooltip";
+
+    fillColor(255, 255, 255, 64);
+    strokeColor(255, 255, 255, 255);
+    beginPath();
+    rect(x, y, bounds.getWidth(), bounds.getHeight());
+    fill();
+    stroke();
+    closePath();
+    beginPath();
+    fontFaceId(fNanoFont);
+    fillColor(255, 255, 255, 255);
+    text(x, y, buffer, NULL);
+    closePath();
+}
 
 UI *createUI()
 {

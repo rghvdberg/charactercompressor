@@ -19,17 +19,43 @@
 
 #include "CbWidget.hpp"
 #include "Window.hpp"
+#include <iostream>
 
 START_NAMESPACE_DISTRHO
 
-//CbWidget::CbWidget(Window &parent, PopUp *popup) noexcept : NanoWidget(parent)
-//{
-//}
-
-CbWidget::CbWidget(Widget *widget) noexcept : NanoWidget(widget)
+CbWidget::CbWidget(Window &parent) noexcept
+    : NanoWidget(parent), fValue(0.0f), fMin(0.0f), fMax(0.0f)
 {
   ptrHasMouse = nullptr;
 }
 
+CbWidget::CbWidget(Widget *widget) noexcept
+    : NanoWidget(widget), fValue(0.0f), fMin(0.0f), fMax(0.0f)
+{
+  ptrHasMouse = nullptr;
+}
+
+void CbWidget::setPtrHasMouse(CbWidget **ptr)
+{
+  ptrHasMouse = ptr;
+}
+
+float CbWidget::getValue() const
+{
+  return fValue;
+}
+
+void CbWidget::setValue(float value)
+{
+  fValue = std::max(fMin,std::min(value,fMax)); 
+//  repaint();
+}
+
+void CbWidget::setRange(float min, float max)
+{
+  printf("widget %u : fMin %f, fMax %f\n", getId(), min, max);
+  fMin = min;
+  fMax = max;
+}
 
 END_NAMESPACE_DISTRHO

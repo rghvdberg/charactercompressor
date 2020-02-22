@@ -28,22 +28,22 @@ START_NAMESPACE_DISTRHO
 class CbWidget : public NanoWidget
 {
 public:
-  class PopUp
-  {
-  public:
-    virtual ~PopUp() {}
-    virtual void cbPopUp(CbWidget *widget, bool hasMouse, const Point<int> mouse) = 0;
-  };
-  //CbWidget(Window &parent, PopUp * popup) noexcept;
+  CbWidget(Window &parent) noexcept;
   CbWidget(Widget *widget) noexcept;
-  CbWidget * ptrHasMouse;
+  CbWidget **ptrHasMouse;
+  void setPtrHasMouse(CbWidget **ptr);
+  float getValue() const;
+  void setValue(float value);
+  void setRange(float min, float max);
 
 protected:
+  float fValue;
+  float fMin;
+  float fMax;
+
 private:
-  
   DISTRHO_LEAK_DETECTOR(CbWidget)
 };
-
 
 END_NAMESPACE_DISTRHO
 #endif

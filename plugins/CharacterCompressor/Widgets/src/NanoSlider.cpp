@@ -22,14 +22,11 @@
 
 START_NAMESPACE_DISTRHO
 
-NanoSlider::NanoSlider(Widget *widget, Callback *cb, PopUp *pu)
+NanoSlider::NanoSlider(Widget *widget, Callback *cb)
     : CbWidget(widget),
-      fValue(0.0f),
-      fMin(0.0f),
-      fMax(1.0f),
       fCallback(cb),
-      mouseDown(false),
-      fPopUp(pu)
+      mouseDown(false)
+
 {
     loadSharedResources();
     fNanoFont = findFont(NANOVG_DEJAVU_SANS_TTF);
@@ -101,22 +98,6 @@ void NanoSlider::onNanoDisplay()
     closePath(); */
 }
 
-void NanoSlider::setValue(float value)
-{
-    fValue = value;
-    if (fValue > fMax)
-        fValue = fMax;
-    if (fValue < fMin)
-        fValue = fMin;
-    repaint();
-}
-
-void NanoSlider::setRange(float min, float max)
-{
-    fMin = min;
-    fMax = max;
-}
-
 void NanoSlider::setLabel(std::string label)
 {
     Label = label;
@@ -125,11 +106,6 @@ void NanoSlider::setLabel(std::string label)
 void NanoSlider::setColor(Color color)
 {
     cHandle = color;
-}
-
-float NanoSlider::getValue() const
-{
-    return fValue;
 }
 
 bool NanoSlider::onMouse(const MouseEvent &ev)
@@ -152,18 +128,17 @@ bool NanoSlider::onMouse(const MouseEvent &ev)
 bool NanoSlider::onMotion(const MotionEvent &ev)
 {
 
-    if (contains(ev.pos))
+    if (contains(ev.pos) && !mouseDown)
 
     {
-        ptrHasMouse = this;
-        printf("id = %u\n", ptrHasMouse->getId());
+        *ptrHasMouse = this;
     }
     else
     {
-       if (ptrHasMouse)
+        if (*ptrHasMouse)
         {
-            if (ptrHasMouse->getId() == getId())
-                ptrHasMouse = nullptr;
+            if (((*ptrHasMouse)->getId() == getId()) && !mouseDown)
+                *ptrHasMouse = nullptr;
         }
     }
 

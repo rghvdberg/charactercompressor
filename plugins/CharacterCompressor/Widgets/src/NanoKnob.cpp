@@ -19,14 +19,12 @@
 
 #include "NanoKnob.hpp"
 #include "Window.hpp"
+#include <iostream>
 
 START_NAMESPACE_DISTRHO
 
 NanoKnob::NanoKnob(Widget *parent, Callback *cb)
     : CbWidget(parent),
-      fValue(0.0f),
-      fMin(0.0f),
-      fMax(1.0f),
       fRadius(1.0f),
       fCallback(cb),
       mouseDown(false)
@@ -118,21 +116,6 @@ void NanoKnob::onNanoDisplay()
     closePath();
 }
 
-void NanoKnob::setValue(float value)
-{
-    fValue = value;
-    if (fValue > fMax)
-        fValue = fMax;
-    if (fValue < fMin)
-        fValue = fMin;
-    repaint();
-}
-
-void NanoKnob::setRange(float min, float max)
-{
-    fMin = min;
-    fMax = max;
-}
 void NanoKnob::setRadius(float radius)
 {
     fRadius = radius;
@@ -147,10 +130,6 @@ void NanoKnob::setColors(Color value, Color range)
 {
     cValue = value;
     cRange = range;
-}
-float NanoKnob::getValue() const
-{
-    return fValue;
 }
 
 bool NanoKnob::onMouse(const MouseEvent &ev)
@@ -175,16 +154,15 @@ bool NanoKnob::onMotion(const MotionEvent &ev)
     if (contains(ev.pos))
 
     {
-        ptrHasMouse = this;
-        printf("id = %u\n", ptrHasMouse->getId());
+        *ptrHasMouse = this;
     }
     else
     {
-        if (ptrHasMouse)
+        if (*ptrHasMouse)
         {
             
-            if (ptrHasMouse->getId() == getId())
-                ptrHasMouse = nullptr;
+            if ((*ptrHasMouse)->getId() == getId())
+                *ptrHasMouse = nullptr;
         }
     }
 
@@ -207,7 +185,8 @@ bool NanoKnob::onScroll(const ScrollEvent &ev)
         return false;
     float delta = ev.delta.getY() * (fMax - fMin) / 50;
     setValue(fValue + delta);
-    fCallback->nanoKnobValueChanged(this, fValue);
+    fCallback->nanoKnobValueChanged(this, getValue());
+    *ptrHasMouse = nullptr;
     return true;
 }
 

@@ -38,9 +38,6 @@ public:
     };
     explicit NanoKnob(Widget *parent, Callback *cb);
 
-    float getValue() const;
-    void setValue(float value);
-    void setRange(float min, float max);
     void setRadius(float radius);
     void setLabel(std::string lable);
     void setColors(Color value, Color range);
@@ -52,9 +49,6 @@ protected:
     bool onMotion(const MotionEvent &ev) override;
 
 private:
-    float fValue;
-    float fMin;
-    float fMax;
     float fRadius;
     std::string Label;
     Callback *const fCallback;

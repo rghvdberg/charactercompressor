@@ -36,11 +36,8 @@ public:
         virtual ~Callback() {}
         virtual void nanoSliderValueChanged(NanoSlider *slider, float value) = 0;
     };
-    explicit NanoSlider(Widget *parent, Callback *cb, PopUp * pu);
+    explicit NanoSlider(Widget *parent, Callback *cb);
 
-    float getValue() const;
-    void setValue(float value);
-    void setRange(float min, float max);
     void setLabel(std::string lable);
     void setColor(Color color);
 
@@ -51,19 +48,14 @@ protected:
     bool onMotion(const MotionEvent &ev) override;
 
 private:
-    float fValue;
-    float fMin;
-    float fMax;
     float fRadius;
     std::string Label;
     Callback *const fCallback;
-    PopUp   *const fPopUp;
     bool mouseDown;
     Point<int> mousePoint;
     FontId fNanoFont;
     Rectangle<int> handle;
     Color cHandle;
-    uint timer;
     bool hasMouse;
 
     DISTRHO_LEAK_DETECTOR(NanoSlider)
