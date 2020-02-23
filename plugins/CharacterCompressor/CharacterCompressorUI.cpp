@@ -38,72 +38,113 @@ CharacterCompressorUI::CharacterCompressorUI()
     fNanoFont = findFont(NANOVG_DEJAVU_SANS_TTF);
     const Size<uint> knobSize(80, 100);
     const float knobRadius = 35;
-    const int knob_x_spacing = 90;
-    const int knob_x = 40;
-    const int knob_y = 20;
+    const int knob_x_spacing = 100;
+    const int knob_x = 10;
+    const int knob_y = 45;
+    const auto ui_width = getWidth();
+    const auto ui_height = getHeight();
 
     newTime = std::chrono::high_resolution_clock::now();
     oldTime = newTime;
 
+    tabEasy = new Tab(this);
+    tabEasy->setAbsolutePos(0, 0);
+    tabEasy->setSize(100, 100);
+    tabEasy->setVisible(true);
+
+    tabAdvanced = new Tab(this);
+    tabAdvanced->setAbsolutePos(0, 0);
+    tabAdvanced->setSize(100, 100);
+    tabAdvanced->setVisible(false);
+
+    buttonEasy = new Button(this, this);
+    buttonEasy->setId(800);
+    buttonEasy->setSize(ui_width / 2, 20);
+    buttonEasy->setAbsolutePos(0, 0);
+    buttonEasy->setLabel("Easy");
+    buttonEasy->setLabelColor(Secondary1Shade1);
+    buttonEasy->setBackgroundColor(Secondary1Shade0);
+
+    buttonAdvanced = new Button(this, this);
+    buttonAdvanced->setId(801);
+    buttonAdvanced->setSize(ui_width / 2, 20);
+    buttonAdvanced->setAbsolutePos(ui_width / 2, 0);
+    buttonAdvanced->setLabel("Advanced");
+    buttonAdvanced->setLabelColor(Secondary2Shade0);
+    buttonAdvanced->setBackgroundColor(Secondary2Shade4);
+
     fNanoMeter = new NanoMeter(this);
     fNanoMeter->setId(p_gainReduction);
-    fNanoMeter->setAbsolutePos(10, 10);
-    fNanoMeter->setSize(10, knobSize.getHeight());
+    fNanoMeter->setAbsolutePos(ui_width - 10, ui_height - 60);
+    fNanoMeter->setSize(10, 60);
     fNanoMeter->setRange(paramRange[p_gainReduction].min, paramRange[p_gainReduction].max);
     fNanoMeter->setValue(paramRange[p_gainReduction].def);
-    fNanoMeter->setZ(2);
+    fNanoMeter->setZ(1);
 
-    fInGain = new NanoSlider(this, this);
-    fInGain->setId(p_Input_Gain);
-    fInGain->setAbsolutePos(knob_x, knob_y);
-    fInGain->setSize(20, 100);
-    fInGain->setValue(paramRange[p_Input_Gain].def);
-    fInGain->setRange(paramRange[p_Input_Gain].min, paramRange[p_Input_Gain].max);
-    fInGain->setLabel(paramNames[p_Input_Gain]);
-    fInGain->setColor(Secondary1Shade1);
-    fInGain->setPtrHasMouse(dblWidgetPtr);
-    fInGain->setZ(3);
-
-    fThreshold = new NanoKnob(this, this);
+    fThreshold = new NanoKnob(tabEasy, this);
     fThreshold->setId(p_Threshold);
-    fThreshold->setAbsolutePos(knob_x + knob_x_spacing * 1, knob_y);
+    fThreshold->setAbsolutePos(knob_x + knob_x_spacing * 0, knob_y);
     fThreshold->setSize(knobSize);
     fThreshold->setRadius(knobRadius);
     fThreshold->setValue(paramRange[p_Threshold].def);
     fThreshold->setRange(paramRange[p_Threshold].min, paramRange[p_Threshold].max);
     fThreshold->setLabel(paramNames[p_Threshold]);
-    fThreshold->setColors(Secondary1Shade1, Secondary1Shade0);
+    fThreshold->setColors(Secondary2Shade1, Secondary2Shade2);
     fThreshold->setPtrHasMouse(dblWidgetPtr);
-    fThreshold->setZ(4);
+    fThreshold->setZ(2);
 
-    fAttack = new NanoKnob(this, this);
+    fStrength = new NanoKnob(tabEasy, this);
+    fStrength->setId(p_strength);
+    fStrength->setAbsolutePos(knob_x + knob_x_spacing * 1, knob_y);
+    fStrength->setSize(knobSize);
+    fStrength->setRadius(knobRadius);
+    fStrength->setValue(paramRange[p_strength].def);
+    fStrength->setRange(paramRange[p_strength].min, paramRange[p_strength].max);
+    fStrength->setLabel(paramNames[p_strength]);
+    fStrength->setColors(Secondary2Shade1, Secondary2Shade2);
+    fStrength->setPtrHasMouse(dblWidgetPtr);
+    fStrength->setZ(3);
+
+    fAttack = new NanoKnob(tabEasy, this);
     fAttack->setId(p_Attack);
-    fAttack->setAbsolutePos(knob_x + knob_x_spacing * 3, knob_y);
+    fAttack->setAbsolutePos(knob_x + knob_x_spacing * 2, knob_y);
     fAttack->setSize(knobSize);
     fAttack->setRadius(knobRadius);
     fAttack->setRange(paramRange[p_Attack].min, paramRange[p_Attack].max);
     fAttack->setValue(paramRange[p_Attack].def);
     fAttack->setLabel(paramNames[p_Attack]);
-    fAttack->setColors(Secondary2Shade1, Secondary2Shade3);
+    fAttack->setColors(Secondary1Shade1, Secondary1Shade2);
     fAttack->setPtrHasMouse(dblWidgetPtr);
-    fAttack->setZ(5);
+    fAttack->setZ(4);
 
-    fRelease = new NanoKnob(this, this);
+    fRelease = new NanoKnob(tabEasy, this);
     fRelease->setId(p_Release);
-    fRelease->setAbsolutePos(knob_x + knob_x_spacing * 4, knob_y);
+    fRelease->setAbsolutePos(knob_x + knob_x_spacing * 3, knob_y);
     fRelease->setSize(knobSize);
     fRelease->setRadius(knobRadius);
     fRelease->setValue(paramRange[p_Release].def);
     fRelease->setRange(paramRange[p_Release].min, paramRange[p_Release].max);
     fRelease->setLabel(paramNames[p_Release]);
-    fRelease->setColors(Secondary1Shade1, Secondary2Shade3);
+    fRelease->setColors(Secondary1Shade1, Secondary1Shade2);
     fRelease->setPtrHasMouse(dblWidgetPtr);
-    fRelease->setZ(6);
+    fRelease->setZ(5);
+
+    fInGain = new NanoKnob(tabEasy, this);
+    fInGain->setId(p_Input_Gain);
+    fInGain->setAbsolutePos(knob_x + knob_x_spacing * 4, knob_y);
+    fInGain->setSize(knobSize);
+    fInGain->setRadius(knobRadius);
+    fInGain->setValue(paramRange[p_Input_Gain].def);
+    fInGain->setRange(paramRange[p_Input_Gain].min, paramRange[p_Input_Gain].max);
+    fInGain->setLabel(paramNames[p_Input_Gain]);
+    fInGain->setColors(PrimaryShade0, PrimaryShade1);
+    fInGain->setPtrHasMouse(dblWidgetPtr);
+    fInGain->setZ(6);
 
     fHistogram = new NanoHistogram(this);
     fHistogram->setId(999); // FIX MAGIC NUMBER
-    fHistogram->setHistoryLength(500);
-    fHistogram->setSize(500, 60);
+    fHistogram->setHistoryLength(490);
+    fHistogram->setSize(490, 60);
     fHistogram->setAbsolutePos(0, 250 - 60);
     fHistogram->setZ(7);
 
@@ -111,7 +152,7 @@ CharacterCompressorUI::CharacterCompressorUI()
     fTooltip->setId(888);
     fTooltip->setAbsolutePos(100, 70);
     fTooltip->setLabel("this is a tooltip");
-    fTooltip->setZ(8);
+    fTooltip->setZ(0);
     fTooltip->setVisible(false);
 }
 
@@ -148,6 +189,9 @@ void CharacterCompressorUI::parameterChanged(uint32_t index, float value)
     }
     case p_Threshold:
         fThreshold->setValue(value);
+        break;
+    case p_strength:
+        fStrength->setValue(value);
         break;
     case p_Attack:
         fAttack->setValue(value);
@@ -205,17 +249,41 @@ void CharacterCompressorUI::idleCallback()
 }
 
 void CharacterCompressorUI::nanoKnobValueChanged(NanoKnob *knob, const float value)
-
 {
     int KnobId = knob->getId();
     setParameterValue(KnobId, value);
 }
 
 void CharacterCompressorUI::nanoSliderValueChanged(NanoSlider *slider, const float value)
-
 {
     int SliderId = slider->getId();
     setParameterValue(SliderId, value);
+}
+
+void CharacterCompressorUI::buttonClicked(Button *button, const bool value)
+{
+    const uint id = button->getId();
+    switch (id)
+    {
+    case 800:
+        tabEasy->show();
+        tabAdvanced->hide();
+        buttonEasy->setLabelColor(Secondary1Shade1);
+        buttonEasy->setBackgroundColor(Secondary1Shade0);
+        buttonAdvanced->setLabelColor(Secondary2Shade0);
+        buttonAdvanced->setBackgroundColor(Secondary2Shade4);
+        break;
+    case 801:
+        tabEasy->hide();
+        tabAdvanced->show();
+        buttonEasy->setLabelColor(Secondary1Shade0);
+        buttonEasy->setBackgroundColor(Secondary1Shade4);
+        buttonAdvanced->setLabelColor(Secondary2Shade1);
+        buttonAdvanced->setBackgroundColor(Secondary2Shade2);
+
+    default:
+        break;
+    }
 }
 
 bool CharacterCompressorUI::onMotion(const MotionEvent &ev)

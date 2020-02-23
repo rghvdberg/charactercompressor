@@ -45,7 +45,11 @@ void NanoHistogram::setHistoryLength(int h)
     fInVolumeHistory.resize(history);
     fOutVolumeHistory.resize(history);
     fGainReductionHistory.resize(history);
+    std::fill(fInVolumeHistory.begin(), fInVolumeHistory.end(), -60.0f);
+    std::fill(fOutVolumeHistory.begin(), fOutVolumeHistory.end(), -60.0f);
+    std::fill(fGainReductionHistory.begin(), fGainReductionHistory.end(), 0.0f);
 }
+
 void NanoHistogram::onNanoDisplay()
 {
     drawInput();
@@ -116,9 +120,8 @@ void NanoHistogram::drawGainReduction()
     const float r2 = Secondary2Shade4.red;
     const float g2 = Secondary2Shade4.green;
     const float b2 = Secondary2Shade4.blue;
-    const Color col1 = Color(r1,g1,b1,0.8f);
-    const Color col2 = Color(r2,g2,b2,0.8f);
-  
+    const Color col1 = Color(r1, g1, b1, 0.8f);
+    const Color col2 = Color(r2, g2, b2, 0.8f);
 
     const Paint bg = linearGradient(w / 2, 0, w / 2, h, col1, col2);
     beginPath();
@@ -134,7 +137,7 @@ void NanoHistogram::drawGainReduction()
     lineTo(0, 0);
     lineTo(0, -fGainReductionHistory[historyHead]);
     stroke();
-    
+
     //fillColor(255,255,255);
     fillPaint(bg);
     fill();

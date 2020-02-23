@@ -21,7 +21,9 @@ FILES_UI  = CharacterCompressorUI.cpp \
 			Widgets/src/NanoHistogram.cpp \
 			Widgets/src/NanoSlider.cpp \
 			Widgets/src/CbWidget.cpp \
-			Widgets/src/ToolTip.cpp
+			Widgets/src/ToolTip.cpp \
+			Widgets/src/Tab.cpp \
+			Widgets/src/Button.cpp
 
 # --------------------------------------------------------------
 # Do some magic

@@ -22,6 +22,8 @@
 #include "Widgets/NanoHistogram.hpp"
 #include "Widgets/NanoSlider.hpp"
 #include "Widgets/ToolTip.hpp"
+#include "Widgets/Tab.hpp"
+#include "Widgets/Button.hpp"
 #include "Resources/Colors.hpp"
 #include <chrono>
 
@@ -32,6 +34,7 @@ START_NAMESPACE_DISTRHO
 class CharacterCompressorUI : public UI,
     public NanoKnob::Callback,
     public NanoSlider::Callback,
+    public Button::Callback,
     public IdleCallback
 {
 public: 
@@ -42,14 +45,17 @@ protected:
     void onNanoDisplay() override;
     void nanoKnobValueChanged( NanoKnob* nanoKnob, const float value) override;
     void nanoSliderValueChanged( NanoSlider* nanoSlider, const float value) override;
+    void buttonClicked( Button* button, const bool clicked) override;
     void idleCallback() override;
     bool onMotion( const MotionEvent &ev) override;
 private:
     
     ScopedPointer<NanoMeter> fNanoMeter;
-    ScopedPointer<NanoKnob> fThreshold,fRatio,fAttack,fRelease;
+    ScopedPointer<NanoKnob> fThreshold,fStrength,fAttack,fRelease,fInGain;
     ScopedPointer<NanoHistogram> fHistogram;
-    ScopedPointer<NanoSlider> fInGain;
+    ScopedPointer<Tab> tabEasy, tabAdvanced;
+    ScopedPointer<Button> buttonEasy,buttonAdvanced;
+    //ScopedPointer<NanoSlider>
     ScopedPointer<ToolTip> fTooltip;
     FontId fNanoFont;
     float fInputLevel, fOutputLevel, fdBInput, fdBOutput, fdBGainReduction;
@@ -58,6 +64,7 @@ private:
     std::chrono::high_resolution_clock::time_point oldTime,newTime;
     CbWidget * widgetPtr;
     CbWidget ** dblWidgetPtr;
+
     // Parameters
 
     DISTRHO_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(CharacterCompressorUI)

@@ -115,12 +115,12 @@ bool NanoSlider::onMouse(const MouseEvent &ev)
     {
         mouseDown = true;
         mousePoint = ev.pos;
-        return true;
+        return false;
     }
     else if (mouseDown)
     {
         mouseDown = false;
-        return true;
+        return false;
     }
     return false;
 }
